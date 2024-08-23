@@ -1,0 +1,43 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:../dev.db"
+}
+
+generator client {
+  provider = "cargo prisma"
+  output   = "../prisma_client/src/db.rs"
+}
+
+model Guild {
+  id     String @id
+  name   String
+  prefix String
+
+  // embed settings
+  start_embed_settings EmbedSettings @relation(name: "start", fields: [start_embed_settings_id], references: [id]) 
+  end_embed_settings   EmbedSettings @relation(name: "end", fields: [end_embed_settings_id], references: [id]) 
+
+  created_at              DateTime @default(now())
+  updated_at              DateTime @updatedAt
+  
+  end_embed_settings_id   String   @unique
+  start_embed_settings_id String   @unique
+}
+
+model EmbedSettings {
+  id          String @id
+  // embed settings
+  color       String
+  title       String
+  description String
+  image       String
+  thumbnail   String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  start      Guild?   @relation(name: "start")
+  end        Guild?   @relation(name: "end")
+}
+
+
+
