@@ -1,5 +1,5 @@
 
-use std::{borrow::BorrowMut, time::{Duration, SystemTime, UNIX_EPOCH}};
+use std::{borrow::BorrowMut, sync::Arc, time::{Duration, SystemTime, UNIX_EPOCH}};
 
 use crate::prelude::*;
 
@@ -27,8 +27,6 @@ pub async fn start(
         ctx.reply("Timer must be between 1 minute and 1 week").await?;
         return Ok(());
     }
-
-
 	ctx.data().manager.lock().await.create_giveaway(&ctx, prize, winners, timer).await?;
     Ok(())
 }

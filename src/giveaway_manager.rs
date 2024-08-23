@@ -10,11 +10,7 @@ use std::{
 };
 use tokio::time::sleep;
 
-pub static HTTPCACHE: OnceCell<Arc<poise::serenity_prelude::Http>> = OnceCell::new();
 
-fn get_http() -> Arc<Http> {
-    HTTPCACHE.get().unwrap().clone()
-}
 
 /// Arguments required to create a giveaway.
 struct GiveawayArgs {
@@ -51,13 +47,14 @@ impl GiveawayArgs {
 }
 
 /// The object to manage a single giveaway.
-struct Giveaway {
+pub struct Giveaway {
     pub args: GiveawayArgs,
     pub job: tokio::task::JoinHandle<()>,
 }
 
 impl Giveaway {
-    async fn start(args: GiveawayArgs) -> (MessageId, Self) {
+    async fn start(args: GiveawayArgs, http: Arc<Http>) -> (MessageId, Self) {
+
         let start = SystemTime::now();
         let since_the_epoch = start
             .duration_since(UNIX_EPOCH)
@@ -74,14 +71,14 @@ impl Giveaway {
             .color(serenity::Colour::ROSEWATER);
 
         let giveaway_msg = ChannelId::new(args.channel_id)
-            .send_message(get_http(), serenity::CreateMessage::new().add_embed(embed))
+            .send_message(http.clone(), serenity::CreateMessage::new().add_embed(embed))
             .await
             .unwrap();
         let c = giveaway_msg.clone();
-
+        
         let job = tokio::spawn(async move {
             sleep(args.timer).await;
-            end(c).await;
+            end(http, c).await;
         });
 
         (giveaway_msg.id, Giveaway { args, job })
@@ -107,13 +104,14 @@ impl GiveawayManager {
         winners: u32,
         timer: Duration,
     ) -> Result<(), Error> {
+        let http = ctx.serenity_context().http.clone();
 
         let (giveaway_id, giveaway) = Giveaway::start(GiveawayArgs::from_ctx(
             ctx,
             prize.clone(),
             winners.clone(),
             timer.clone(),
-        )).await;
+        ), http).await;
 
         self.cache.insert(giveaway_id, giveaway);
 
@@ -121,6 +119,6 @@ impl GiveawayManager {
     }
 }
 
-async fn end(msg: Message) {
-    msg.reply(get_http(), "Giveaway ended!").await.unwrap();
+async fn end(http: Arc<Http>, msg: Message) {
+    msg.reply(http, "Giveaway ended!").await.unwrap();
 }

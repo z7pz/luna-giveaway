@@ -1,21 +1,27 @@
 use std::time::Duration;
 
-use giveaway_manager::{GiveawayManager, HTTPCACHE};
+use giveaway_manager::GiveawayManager;
 use poise::serenity_prelude::{self as serenity};
 use tokio::time::sleep;
 
 mod commands;
 mod giveaway_manager;
 mod prelude;
+use futures::lock::Mutex;
 use prelude::*;
-use futures::{future::{join, join_all}, lock::Mutex};
 /// Displays your or another user's account creation date
 #[poise::command(slash_command, prefix_command)]
 async fn age(
     ctx: Context<'_>,
     #[description = "Selected user"] user: Option<serenity::User>,
 ) -> Result<(), Error> {
-    let servers_msg = ctx.cache().guilds().iter().map(|g| g.name(ctx.cache()).unwrap()).collect::<Vec<_>>().join(", ");
+    let servers_msg = ctx
+        .cache()
+        .guilds()
+        .iter()
+        .map(|g| g.name(ctx.cache()).unwrap())
+        .collect::<Vec<_>>()
+        .join(", ");
     let u = user.as_ref().unwrap_or_else(|| ctx.author());
     let response = format!("{}'s account was created at {}", u.name, u.created_at());
     ctx.reply(response).await?;
@@ -29,11 +35,14 @@ async fn help(
     ctx: Context<'_>,
     #[description = "Select a command"] command: Option<String>,
 ) -> Result<(), Error> {
-    poise::builtins::help(ctx, command.as_ref().map(|c| c.as_str()), poise::builtins::HelpConfiguration::default()).await?;
+    poise::builtins::help(
+        ctx,
+        command.as_ref().map(|c| c.as_str()),
+        poise::builtins::HelpConfiguration::default(),
+    )
+    .await?;
     Ok(())
 }
-
-
 
 #[tokio::main]
 async fn main() {
@@ -49,7 +58,6 @@ async fn main() {
             ..Default::default()
         })
         .setup(|ctx, _ready, framework| {
-            HTTPCACHE.set(ctx.http.clone()).unwrap();
             Box::pin(async move {
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
                 Ok(Data {
@@ -81,22 +89,21 @@ async fn main() {
         }
     });
 
-// 
-//     for id in 1..=5000 {
-//         let duration = if id % 2 == 0 {
-//             Duration::from_secs(5) // 2 days
-//         } else {
-//             Duration::from_secs(2) // 7 days
-//         };
-// 
-//         let task = tokio::spawn(async move {
-//             sleep(duration).await;
-//             perform_task(id).await;
-//         });
-// 
-//         tasks.push(task);
-//     }
-
+    //
+    //     for id in 1..=5000 {
+    //         let duration = if id % 2 == 0 {
+    //             Duration::from_secs(5) // 2 days
+    //         } else {
+    //             Duration::from_secs(2) // 7 days
+    //         };
+    //
+    //         let task = tokio::spawn(async move {
+    //             sleep(duration).await;
+    //             perform_task(id).await;
+    //         });
+    //
+    //         tasks.push(task);
+    //     }
 
     // Start two shards. Note that there is an ~5 second ratelimit period between when one shard
     // can start after another.
@@ -118,7 +125,15 @@ async fn event_handler(
                 // This may seem unintuitive, but it models Discord's behaviour.
                 println!(
                     "{} is connected on shard {}/{}! {:#?} {} guilds in cache",
-                    data_about_bot.user.name, shard.id, shard.total, data_about_bot.guilds.iter().map(|g| g.id).collect::<Vec<_>>(), ctx.cache.guilds().len()
+                    data_about_bot.user.name,
+                    shard.id,
+                    shard.total,
+                    data_about_bot
+                        .guilds
+                        .iter()
+                        .map(|g| g.id)
+                        .collect::<Vec<_>>(),
+                    ctx.cache.guilds().len()
                 );
             }
         }
@@ -127,16 +142,13 @@ async fn event_handler(
     Ok(())
 }
 
-
-
-
 async fn perform_task(id: u32) {
     println!("Task {} executed!", id);
 }
-// 
+//
 // #[tokio::main]
 // async fn main() {
-// 
+//
 //     // Optionally, wait for all tasks to complete (not blocking other tasks)
 //     // join_all(tasks).await;
 // }
