@@ -4,7 +4,7 @@ use std::{
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
-use crate::prelude::*;
+use crate::{giveaway_manager::GiveawayArguments, prelude::*};
 
 /// Create a giveaway command with prize, winners, and timer as arguments
 #[poise::command(slash_command, prefix_command)]
@@ -14,26 +14,6 @@ pub async fn start(
     #[description = "number of winners"] winners: u32,
     #[description = "timer"] timer: String,
 ) -> Result<(), Error> {
-    // check winners if is 0
-    if winners == 0 {
-        ctx.reply("Number of winners cannot be 0").await?;
-        return Ok(());
-    }
-
-    let Ok(timer) = parse_duration::parse(&timer) else {
-        ctx.reply("Invalid time format").await?;
-        return Ok(());
-    };
-
-    // check if timer is less than 1 minute and greater than a week
-    // if timer < Duration::from_secs(60) || timer > Duration::from_secs(60 * 60 * 24 * 7) {
-    if timer < Duration::from_secs(2) || timer > Duration::from_secs(60 * 60 * 24 * 7) {
-        ctx.reply("Timer must be between 1 minute and 1 week")
-            .await?;
-        return Ok(());
-    }
-    // we dont want to throw if error happened
-    let _ = ctx.data().manager.lock().await.create_giveaway(&ctx, prize, winners, timer).await;
-
+    ctx.data().manager.create(&ctx, GiveawayArguments::new(&ctx, prize, winners, Duration::new(2, 0))).await?;
     Ok(())
 }

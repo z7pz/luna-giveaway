@@ -1,7 +1,9 @@
+use tokio::sync::mpsc;
+
 use std::{sync::Arc, time::Duration};
 
-use giveaway_manager::{GiveawayManager, MANAGER};
-use poise::serenity_prelude::{self as serenity};
+use giveaway_manager::GiveawayManager;
+use poise::serenity_prelude::{self as serenity, EditMessage};
 use tokio::time::sleep;
 
 mod commands;
@@ -29,23 +31,26 @@ async fn help(
 async fn main() {
     let token = "MTI0ODAyNDk4MzMwNTk4MTk2Mg.GMyrcS.zaWcvrrLizzWZ5nBdDUJtJNluRRa0EDpLRB_-U";
     let intents = serenity::GatewayIntents::non_privileged();
-
+    let (tx, mut rx) = mpsc::channel(100);
+    let manager = giveaway_manager::GiveawayManager::new(tx).await;
+    let data = Data { manager };
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
-            commands: vec![commands::end(), commands::start(),commands::reroll(), help()],
+            commands: vec![
+                commands::end(),
+                commands::start(),
+                commands::reroll(),
+                help(),
+            ],
             event_handler: |ctx, event, framework, data| {
                 Box::pin(event_handler(ctx, event, framework, data))
             },
             ..Default::default()
         })
         .setup(|ctx, _ready, framework| {
-            let manager = Arc::new(Mutex::new(GiveawayManager::new()));
-            MANAGER.set(manager.clone()).unwrap();
             Box::pin(async move {
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
-                Ok(Data {
-                    manager,
-                })
+                Ok(data)
             })
         })
         .build();
@@ -71,12 +76,28 @@ async fn main() {
             }
         }
     });
-    
+
     // Start two shards. Note that there is an ~5 second ratelimit period between when one shard
     // can start after another.
-    if let Err(why) = client.start().await {
-        println!("Client error: {why:?}");
-    }
+    let cache_http = client.http.clone();
+    let manager_job = tokio::spawn(async move {
+        while let Some(giveaway) = rx.recv().await {
+            println!("test");
+            let cache_http = cache_http.clone();
+            if let Err(error) = giveaway.args.channel_id.edit_message(cache_http, giveaway.message_id, EditMessage::new().content("test")).await {
+                println!("Error: {:?}", error);
+            };
+        }
+    });
+    let client_job = tokio::spawn(async move {
+        if let Err(why) = client.start().await {
+            println!("Client error: {why:?}");
+        }
+    });
+    
+
+    client_job.await.unwrap();
+    manager_job.await.unwrap();
 }
 
 async fn event_handler(
@@ -105,18 +126,18 @@ async fn event_handler(
                 );
             }
         }
-        serenity::FullEvent::InteractionCreate { interaction } => {
-            if let Some(interaction) = interaction.as_message_component() {
-                interaction.defer(ctx.http.clone()).await?;
-                if interaction.data.custom_id.as_str() != "giveaway" {
-                    return Ok(())
-                }
-                let giveaway_id = interaction.message.id;
-                if let Some(giveaway) = data.manager.lock().await.cache.get_mut(&giveaway_id) {
-                    giveaway.add_entriy(interaction.user.id, &ctx.http).await;
-                }
-            }
-        }
+        // serenity::FullEvent::InteractionCreate { interaction } => {
+        //     if let Some(interaction) = interaction.as_message_component() {
+        //         interaction.defer(ctx.http.clone()).await?;
+        //         if interaction.data.custom_id.as_str() != "giveaway" {
+        //             return Ok(())
+        //         }
+        //         let giveaway_id = interaction.message.id;
+        //         if let Some(giveaway) = data.manager.lock().await.cache.get_mut(&giveaway_id) {
+        //             giveaway.add_entriy(interaction.user.id, &ctx.http).await;
+        //         }
+        //     }
+        // }
         _ => {}
     }
     Ok(())
