@@ -10,8 +10,8 @@ pub async fn end(
 ) -> Result<(), Error> {
     // TODO get from db args
     // TODO create error handle for this as embeds
-    let mut lock = ctx.data().manager.lock().await;
-    let (giveaway, status) = if let Some( giveaway) = lock.cache.get_mut(&message_id) {
+    let lock = get_manager().lock().await;
+    let (giveaway, status) = if let Some(giveaway) = lock.cache.get(&message_id) {
         if giveaway.args.lock().await.is_ended {
             ctx.reply("Giveaway already ended").await?;
             (giveaway, false)

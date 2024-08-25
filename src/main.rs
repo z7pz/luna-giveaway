@@ -71,23 +71,7 @@ async fn main() {
             }
         }
     });
-    // let mut tasks = vec![];
-    // 
-    //     for id in 1..=5000 {
-    //         let duration = if id % 2 == 0 {
-    //             Duration::from_secs(5) // 2 days
-    //         } else {
-    //             Duration::from_secs(2) // 7 days
-    //         };
-    // 
-    //         let task = tokio::spawn(async move {
-    //             sleep(duration).await;
-    //             perform_task(id).await;
-    //         });
-    // 
-    //         tasks.push(task);
-    //     }
-
+    
     // Start two shards. Note that there is an ~5 second ratelimit period between when one shard
     // can start after another.
     if let Err(why) = client.start().await {

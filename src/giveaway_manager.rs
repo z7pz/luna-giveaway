@@ -175,7 +175,7 @@ impl Giveaway {
             sleep(timer - elapsed).await;
             { a.lock().await.end(http, id) }.await;
         });
-
+        
         Ok(Giveaway {
             message_id: giveaway_msg.id,
             args,
