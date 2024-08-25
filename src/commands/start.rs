@@ -33,7 +33,7 @@ pub async fn start(
         return Ok(());
     }
     // we dont want to throw if error happened
-    let _ = { ctx.data().manager.lock().await.create_giveaway(&ctx, prize, winners, timer) }.await;
+    let _ = ctx.data().manager.lock().await.create_giveaway(&ctx, prize, winners, timer).await;
 
     Ok(())
 }

@@ -1,6 +1,6 @@
 use std::{sync::Arc, time::Duration};
 
-use giveaway_manager::GiveawayManager;
+use giveaway_manager::{GiveawayManager, MANAGER};
 use poise::serenity_prelude::{self as serenity};
 use tokio::time::sleep;
 
@@ -39,10 +39,12 @@ async fn main() {
             ..Default::default()
         })
         .setup(|ctx, _ready, framework| {
+            let manager = Arc::new(Mutex::new(GiveawayManager::new()));
+            MANAGER.set(manager.clone()).unwrap();
             Box::pin(async move {
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
                 Ok(Data {
-                    manager: Mutex::new(GiveawayManager::new()),
+                    manager,
                 })
             })
         })

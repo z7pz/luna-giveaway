@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use crate::{Context, Error};
 use futures::lock::Mutex;
-use serenity::{CacheHttp, ChannelId, EditMessage, GuildId, Http, MessageId, UserId};
+use serenity::{CacheHttp, ChannelId, EditMessage, GuildId, Http, Message, MessageId, UserId};
 
 use rand::seq::SliceRandom;
 use std::sync::Arc;
@@ -12,6 +12,14 @@ use std::{
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 use tokio::time::sleep;
+
+use once_cell::sync::OnceCell;
+
+pub static MANAGER: OnceCell<Arc<Mutex<GiveawayManager>>> = OnceCell::new();
+
+pub fn get_manager() -> &'static Arc<Mutex<GiveawayManager>> {
+    MANAGER.get().unwrap()
+}
 
 /// Arguments required to create a giveaway.
 #[derive(Clone)]
@@ -57,6 +65,10 @@ impl GiveawayArgs {
         entries
     }
     pub async fn end(&mut self, http: impl CacheHttp, message_id: MessageId) {
+        let manager = get_manager();
+        let mut m = manager.lock().await;
+        m.cache.remove(&message_id);
+        drop(m);
         let http = Arc::new(http);
         let winners = self.get_random_winners();
         let builder = EditMessage::new()
@@ -128,7 +140,7 @@ impl GiveawayArgs {
         ))
     }
 }
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 /// The object to manage a single giveaway.
 pub struct Giveaway {
     pub message_id: MessageId,
@@ -156,12 +168,12 @@ impl Giveaway {
         .await?;
         let elapsed = now.elapsed();
 
-        let c = giveaway_msg.clone();
+        let id = giveaway_msg.id.clone();
         let a = Arc::clone(&args);
 
         let job = tokio::spawn(async move {
             sleep(timer - elapsed).await;
-            { a.lock().await.end(http, c.id) }.await;
+            { a.lock().await.end(http, id) }.await;
         });
 
         Ok(Giveaway {
@@ -171,8 +183,8 @@ impl Giveaway {
         })
     }
     pub async fn end(&mut self, http: impl CacheHttp) {
-        let _ = { self.args.lock().await.end(http, self.message_id) }.await;
         self.job.abort();
+        let _ = { self.args.lock().await.end(http, self.message_id) }.await;
     }
     pub async fn add_entriy(&self, user: UserId, http: impl CacheHttp) {
         let mut args = self.args.lock().await;
@@ -195,7 +207,6 @@ impl Giveaway {
             .await;
     }
 }
-
 /// The object to manage multiple giveaways.
 pub struct GiveawayManager {
     pub cache: HashMap<MessageId, Giveaway>,
@@ -228,5 +239,10 @@ impl GiveawayManager {
         self.cache.insert(giveaway.message_id, giveaway);
 
         Ok(())
+    }
+    pub async fn end(&mut self, message_id: &MessageId, http: impl CacheHttp) {
+        if let Some(giveaway) = self.cache.get_mut(message_id) {
+            giveaway.end(http).await;
+        }
     }
 }
