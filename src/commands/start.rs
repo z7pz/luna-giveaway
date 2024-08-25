@@ -1,5 +1,8 @@
-
-use std::{borrow::BorrowMut, sync::Arc, time::{Duration, SystemTime, UNIX_EPOCH}};
+use std::{
+    borrow::BorrowMut,
+    sync::Arc,
+    time::{Duration, SystemTime, UNIX_EPOCH},
+};
 
 use crate::prelude::*;
 
@@ -23,10 +26,14 @@ pub async fn start(
     };
 
     // check if timer is less than 1 minute and greater than a week
-    if timer < Duration::from_secs(60) || timer > Duration::from_secs(60 * 60 * 24 * 7) {
-        ctx.reply("Timer must be between 1 minute and 1 week").await?;
+    // if timer < Duration::from_secs(60) || timer > Duration::from_secs(60 * 60 * 24 * 7) {
+    if timer < Duration::from_secs(2) || timer > Duration::from_secs(60 * 60 * 24 * 7) {
+        ctx.reply("Timer must be between 1 minute and 1 week")
+            .await?;
         return Ok(());
     }
-	ctx.data().manager.lock().await.create_giveaway(&ctx, prize, winners, timer).await?;
+    // we dont want to throw if error happened
+    let _ = { ctx.data().manager.lock().await.create_giveaway(&ctx, prize, winners, timer) }.await;
+
     Ok(())
 }

@@ -1,28 +1,31 @@
 use crate::prelude::*;
 use crate::{Context, Error};
-use cron::Schedule;
-use once_cell::sync::OnceCell;
-use serenity::{CacheHttp, ChannelAction, ChannelId, GuildChannel, Http, Message, MessageId};
+use futures::lock::Mutex;
+use serenity::{CacheHttp, ChannelId, EditMessage, GuildId, Http, MessageId, UserId};
+
+use rand::seq::SliceRandom;
 use std::sync::Arc;
+use std::time::Instant;
+use std::vec;
 use std::{
     collections::HashMap,
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 use tokio::time::sleep;
 
-
-
 /// Arguments required to create a giveaway.
-struct GiveawayArgs {
+#[derive(Clone)]
+pub struct GiveawayArgs {
     pub prize: String,
     pub winners: u32,
     pub timer: Duration,
     pub host: String,
-    pub channel_id: u64,
-    pub guild_id: u64,
-    pub entries: Vec<String>,
+    pub channel_id: ChannelId,
+    pub guild_id: GuildId,
+    pub entries: Vec<UserId>,
     pub starts_at: Duration,
     pub ends_at: Duration,
+    pub is_ended: bool,
 }
 
 impl GiveawayArgs {
@@ -42,46 +45,154 @@ impl GiveawayArgs {
             entries: Vec::new(),
             starts_at: since_the_epoch,
             ends_at: since_the_epoch + timer,
+            is_ended: false,
         }
     }
-}
-
-/// The object to manage a single giveaway.
-pub struct Giveaway {
-    pub args: GiveawayArgs,
-    pub job: tokio::task::JoinHandle<()>,
-}
-
-impl Giveaway {
-    async fn start(args: GiveawayArgs, http: Arc<Http>) -> (MessageId, Self) {
-
-        let start = SystemTime::now();
-        let since_the_epoch = start
-            .duration_since(UNIX_EPOCH)
-            .expect("Time went backwards");
-
+    fn get_random_winners(&self) -> Vec<UserId> {
+        let mut rng = rand::thread_rng();
+        let winners = self.winners as usize;
+        let mut entries = self.entries.clone();
+        entries.shuffle(&mut rng);
+        entries.truncate(winners);
+        entries
+    }
+    pub async fn end(&mut self, http: impl CacheHttp, message_id: MessageId) {
+        let http = Arc::new(http);
+        let winners = self.get_random_winners();
+        let builder = EditMessage::new()
+            .add_embed(self.end_embed(winners.clone()))
+            .components(vec![self.end_row()]);
+        self.is_ended = true;
+        let _ = self
+            .channel_id
+            .edit_message(http.clone(), message_id, builder)
+            .await;
+        let _ = self
+            .channel_id
+            .send_message(http, self.end_message(winners))
+            .await;
+    }
+    fn start_row(&self) -> serenity::CreateActionRow {
+        let button = serenity::CreateButton::new("giveaway")
+            .label("Enter")
+            .style(serenity::ButtonStyle::Primary);
+        let row = serenity::CreateActionRow::Buttons(vec![button]);
+        row
+    }
+    fn start_embed(&self) -> serenity::CreateEmbed {
         let embed = serenity::CreateEmbed::default()
             .title("Giveaway")
             .description(format!(
-                "Prize: {}\nWinners: {}\nTime: <t:{2}:R> <t:{2}>",
-                args.prize,
-                args.winners,
-                since_the_epoch.as_secs() + args.timer.as_secs()
+                "Prize: {}\nEntries: {}\nWinners: {}\nTime: <t:{3}:R> <t:{3}>",
+                self.prize,
+                self.entries.len(),
+                self.winners,
+                self.ends_at.as_secs(),
             ))
-            .color(serenity::Colour::ROSEWATER);
+            .color(0x00ff00);
 
-        let giveaway_msg = ChannelId::new(args.channel_id)
-            .send_message(http.clone(), serenity::CreateMessage::new().add_embed(embed))
-            .await
-            .unwrap();
+        embed
+    }
+    fn end_row(&self) -> serenity::CreateActionRow {
+        // TODO add a button to redirect to the giveaway
+        let button = serenity::CreateButton::new_link("https://google.com").label("Giveaway");
+        let row = serenity::CreateActionRow::Buttons(vec![button]);
+        row
+    }
+    fn end_embed(&self, winners: Vec<UserId>) -> serenity::CreateEmbed {
+        println!("{:?}", winners);
+        let w = winners
+            .iter()
+            .map(|c| format!("<@{}>", c))
+            .collect::<Vec<String>>()
+            .join(", ");
+        let embed = serenity::CreateEmbed::default()
+            .title("Giveaway Ended")
+            .description(format!(
+                "Prize: {}\nWinners: {}",
+                self.prize,
+                if w == "" { "No winners" } else { &w },
+            ))
+            .color((255, 0, 0)); //red
+
+        embed
+    }
+    fn end_message(&self, winners: Vec<UserId>) -> serenity::CreateMessage {
+        serenity::CreateMessage::new().content(format!(
+            "{}",
+            winners
+                .iter()
+                .map(|c| format!("<@{}>", c))
+                .collect::<Vec<_>>()
+                .join(", ")
+        ))
+    }
+}
+#[derive(Clone)]
+/// The object to manage a single giveaway.
+pub struct Giveaway {
+    pub message_id: MessageId,
+    pub args: Arc<Mutex<GiveawayArgs>>,
+    pub job: Arc<tokio::task::JoinHandle<()>>,
+}
+
+impl Giveaway {
+    async fn start(args: Arc<Mutex<GiveawayArgs>>, http: Arc<Http>) -> Result<Self, Error> {
+        let a = Arc::clone(&args);
+        let lock = a.lock().await;
+        let embed = lock.start_embed();
+        let row = lock.start_row();
+        // create something like performance.now() in js
+        let now = Instant::now();
+        let timer = lock.timer.clone();
+        let giveaway_msg = {
+            lock.channel_id.send_message(
+                http.clone(),
+                serenity::CreateMessage::new()
+                    .add_embed(embed)
+                    .components(vec![row]),
+            )
+        }
+        .await?;
+        let elapsed = now.elapsed();
+
         let c = giveaway_msg.clone();
-        
+        let a = Arc::clone(&args);
+
         let job = tokio::spawn(async move {
-            sleep(args.timer).await;
-            end(http, c).await;
+            sleep(timer - elapsed).await;
+            { a.lock().await.end(http, c.id) }.await;
         });
 
-        (giveaway_msg.id, Giveaway { args, job })
+        Ok(Giveaway {
+            message_id: giveaway_msg.id,
+            args,
+            job: Arc::new(job),
+        })
+    }
+    pub async fn end(&mut self, http: impl CacheHttp) {
+        let _ = { self.args.lock().await.end(http, self.message_id) }.await;
+        self.job.abort();
+    }
+    pub async fn add_entriy(&self, user: UserId, http: impl CacheHttp) {
+        let mut args = self.args.lock().await;
+        if args.entries.contains(&user) {
+            return;
+        }
+
+        args.entries.push(user);
+        drop(args);
+        self.update(http).await;
+        // TODO create a debounce
+    }
+    async fn update(&self, http: impl CacheHttp) {
+        let args = self.args.lock().await;
+        let embed = args.start_embed();
+        let builder = EditMessage::new().add_embed(embed);
+        let _ = args
+            .channel_id
+            .edit_message(http, self.message_id, builder)
+            .await;
     }
 }
 
@@ -105,20 +216,17 @@ impl GiveawayManager {
         timer: Duration,
     ) -> Result<(), Error> {
         let http = ctx.serenity_context().http.clone();
-
-        let (giveaway_id, giveaway) = Giveaway::start(GiveawayArgs::from_ctx(
+        let args = Arc::new(Mutex::new(GiveawayArgs::from_ctx(
             ctx,
             prize.clone(),
             winners.clone(),
             timer.clone(),
-        ), http).await;
+        )));
 
-        self.cache.insert(giveaway_id, giveaway);
+        let giveaway = Giveaway::start(args, http).await?;
+
+        self.cache.insert(giveaway.message_id, giveaway);
 
         Ok(())
     }
-}
-
-async fn end(http: Arc<Http>, msg: Message) {
-    msg.reply(http, "Giveaway ended!").await.unwrap();
 }

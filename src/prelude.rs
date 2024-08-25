@@ -1,4 +1,6 @@
 
+use std::sync::Arc;
+
 use crate::giveaway_manager::GiveawayManager;
 pub struct Data {
 	pub manager: Mutex<GiveawayManager>,

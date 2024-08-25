@@ -28,6 +28,11 @@ parse_duration = "2.1.1"
 cron = "0.12.1"
 futures = "0.3"
 once_cell = "1"
+rand = "0.8.5"
+
+
+
+
 [dependencies.tokio]
 version = "1"
 features = ["rt-multi-thread", "signal", "parking_lot"]

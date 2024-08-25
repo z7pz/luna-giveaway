@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{sync::Arc, time::Duration};
 
 use giveaway_manager::GiveawayManager;
 use poise::serenity_prelude::{self as serenity};
@@ -9,25 +9,6 @@ mod giveaway_manager;
 mod prelude;
 use futures::lock::Mutex;
 use prelude::*;
-/// Displays your or another user's account creation date
-#[poise::command(slash_command, prefix_command)]
-async fn age(
-    ctx: Context<'_>,
-    #[description = "Selected user"] user: Option<serenity::User>,
-) -> Result<(), Error> {
-    let servers_msg = ctx
-        .cache()
-        .guilds()
-        .iter()
-        .map(|g| g.name(ctx.cache()).unwrap())
-        .collect::<Vec<_>>()
-        .join(", ");
-    let u = user.as_ref().unwrap_or_else(|| ctx.author());
-    let response = format!("{}'s account was created at {}", u.name, u.created_at());
-    ctx.reply(response).await?;
-    ctx.say(servers_msg).await?;
-    Ok(())
-}
 
 /// If a command is specified, it will display information about that command
 #[poise::command(slash_command, prefix_command)]
@@ -51,9 +32,9 @@ async fn main() {
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
-            commands: vec![age(), commands::start(), help()],
-            event_handler: |ctx, event, framework, _data| {
-                Box::pin(event_handler(ctx, event, framework))
+            commands: vec![commands::end(), commands::start(),commands::reroll(), help()],
+            event_handler: |ctx, event, framework, data| {
+                Box::pin(event_handler(ctx, event, framework, data))
             },
             ..Default::default()
         })
@@ -88,26 +69,26 @@ async fn main() {
             }
         }
     });
-
-    //
+    // let mut tasks = vec![];
+    // 
     //     for id in 1..=5000 {
     //         let duration = if id % 2 == 0 {
     //             Duration::from_secs(5) // 2 days
     //         } else {
     //             Duration::from_secs(2) // 7 days
     //         };
-    //
+    // 
     //         let task = tokio::spawn(async move {
     //             sleep(duration).await;
     //             perform_task(id).await;
     //         });
-    //
+    // 
     //         tasks.push(task);
     //     }
 
     // Start two shards. Note that there is an ~5 second ratelimit period between when one shard
     // can start after another.
-    if let Err(why) = client.start_shards(2).await {
+    if let Err(why) = client.start().await {
         println!("Client error: {why:?}");
     }
 }
@@ -115,7 +96,8 @@ async fn main() {
 async fn event_handler(
     ctx: &serenity::Context,
     event: &serenity::FullEvent,
-    _framework: poise::FrameworkContext<'_, Data, Error>,
+    framework: poise::FrameworkContext<'_, Data, Error>,
+    data: &Data,
 ) -> Result<(), Error> {
     match event {
         serenity::FullEvent::Ready { data_about_bot, .. } => {
@@ -137,18 +119,19 @@ async fn event_handler(
                 );
             }
         }
+        serenity::FullEvent::InteractionCreate { interaction } => {
+            if let Some(interaction) = interaction.as_message_component() {
+                interaction.defer(ctx.http.clone()).await?;
+                if interaction.data.custom_id.as_str() != "giveaway" {
+                    return Ok(())
+                }
+                let giveaway_id = interaction.message.id;
+                if let Some(giveaway) = data.manager.lock().await.cache.get_mut(&giveaway_id) {
+                    giveaway.add_entriy(interaction.user.id, &ctx.http).await;
+                }
+            }
+        }
         _ => {}
     }
     Ok(())
 }
-
-async fn perform_task(id: u32) {
-    println!("Task {} executed!", id);
-}
-//
-// #[tokio::main]
-// async fn main() {
-//
-//     // Optionally, wait for all tasks to complete (not blocking other tasks)
-//     // join_all(tasks).await;
-// }
