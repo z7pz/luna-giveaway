@@ -41,7 +41,7 @@ impl GiveawayManager {
             .send_message(
                 ctx.serenity_context().http.clone(),
                 ctx.channel_id(),
-                vec![],
+                &vec![],
             )
             .await?;
 

@@ -80,22 +80,7 @@ async fn main() {
     let cache_http = client.http.clone();
     let manager_job = tokio::spawn(async move {
         while let Some(giveaway) = rx.recv().await {
-            println!("test");
             let cache_http = cache_http.clone();
-            // giveaway.is_ended
-            // giveaway.send_message(cache_http.clone()).await;
-            if let Err(error) = giveaway
-                .args
-                .channel_id
-                .edit_message(
-                    cache_http,
-                    giveaway.message_id,
-                    EditMessage::new().content("test"),
-                )
-                .await
-            {
-                println!("Error: {:?}", error);
-            };
         }
     });
     let client_job = tokio::spawn(async move {
@@ -143,7 +128,7 @@ async fn event_handler(
 
                 let giveaway_id = interaction.message.id;
                 if let Some(giveaway) = data.manager.giveaways.lock().await.get_mut(&giveaway_id) {
-                    giveaway
+                    let _ = giveaway
                         .add_entry(interaction.user.id, ctx.http.clone())
                         .await;
                 };

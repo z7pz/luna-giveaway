@@ -19,6 +19,6 @@ impl Giveaway {
         Ok(self.update_message(cache_http).await?)
     }
     pub async fn update_message(&self, cache_http: impl CacheHttp) -> Result<Message, Error> {
-        Ok(self.args.channel_id.edit_message(cache_http, self.message_id, self.args.edit_message(self.entries.clone())).await?)
+        Ok(self.args.channel_id.edit_message(cache_http, self.message_id, self.args.edit_message(&self.entries)).await?)
     } 
 }

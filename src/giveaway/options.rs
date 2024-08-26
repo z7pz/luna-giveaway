@@ -16,7 +16,7 @@ pub struct GiveawayOptions {
     pub ends_at: Duration,
 }
 impl GiveawayOptions {
-    pub fn message_description(&self, entries: Vec<UserId>) -> String {
+    pub fn message_description(&self, entries: &Vec<UserId>) -> String {
         format!(
             "Prize: {}\nEntries: {}\nWinners: {}\nTime: <t:{3}:R> <t:{3}>",
             self.prize,
@@ -25,7 +25,7 @@ impl GiveawayOptions {
             self.ends_at.as_secs(),
         )
     }
-    pub fn embed(&self, entries: Vec<UserId>) -> CreateEmbed {
+    pub fn embed(&self, entries: &Vec<UserId>) -> CreateEmbed {
         let embed = CreateEmbed::default()
             .title("Giveaway")
             .description(self.message_description(entries))
@@ -33,17 +33,17 @@ impl GiveawayOptions {
 
         embed
     }
-    pub fn create_message(&self, entries: Vec<UserId>) -> CreateMessage {
+    pub fn create_message(&self, entries: &Vec<UserId>) -> CreateMessage {
         CreateMessage::new().embed(self.embed(entries))
     }
-    pub fn edit_message(&self, entries: Vec<UserId>) -> EditMessage {
+    pub fn edit_message(&self, entries: &Vec<UserId>) -> EditMessage {
         EditMessage::new().embed(self.embed(entries))
     }
     pub async fn send_message(
         &self,
         http: Arc<Http>,
         channel_id: ChannelId,
-        entries: Vec<UserId>,
+        entries: &Vec<UserId>,
     ) -> Result<Message, Error> {
         Ok(channel_id
             .send_message(http, self.create_message(entries))
