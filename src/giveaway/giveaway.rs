@@ -1,13 +1,15 @@
 use poise::serenity_prelude::{CacheHttp, Message, MessageId, UserId};
+use rand::seq::SliceRandom;
+use serenity::EditMessage;
 
 
-use super::options::GiveawayOptions;
+use super::options::{EndMessage, GiveawayOptions, StartMessage};
 use crate::prelude::*;
 
 #[derive(Debug)]
 pub struct Giveaway {
     pub message_id: MessageId,
-    pub args: GiveawayOptions,
+    pub options: GiveawayOptions,
     pub entries: Vec<UserId>,
     pub is_ended: bool,
 }
@@ -15,10 +17,22 @@ pub struct Giveaway {
 
 impl Giveaway {
     pub async fn add_entry(&mut self, user_id: UserId, cache_http: impl CacheHttp) -> Result<Message, Error> {
+        println!("Adding entry: {}", user_id);
+        if self.is_ended {
+            return Err("Giveaway has ended".into());
+        }
         self.entries.push(user_id);
-        Ok(self.update_message(cache_http).await?)
+        println!("Added entry: {}", user_id);
+        Ok(self.update_message(cache_http, StartMessage::edit_message(&self.options, &self.entries)).await?)
     }
-    pub async fn update_message(&self, cache_http: impl CacheHttp) -> Result<Message, Error> {
-        Ok(self.args.channel_id.edit_message(cache_http, self.message_id, self.args.edit_message(&self.entries)).await?)
-    } 
+    pub async fn update_message(&self, cache_http: impl CacheHttp, edit_message: EditMessage) -> Result<Message, Error> {
+        Ok(self.options.channel_id.edit_message(cache_http, self.message_id, edit_message).await?)
+    }
+    pub async fn end(&mut self, cache_http: impl CacheHttp) -> Result<Message, Error> {
+        self.is_ended = true;
+        Ok(self.update_message(cache_http, EndMessage::edit_message(&self.options, &self.entries, self.get_winners())).await?)
+    }
+    pub fn get_winners(&self) -> Vec<&UserId> {
+        self.entries.choose_multiple(&mut rand::thread_rng(), self.options.winners as usize).collect::<Vec<&UserId>>()
+    }
 }

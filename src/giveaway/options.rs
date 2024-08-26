@@ -1,6 +1,12 @@
-use std::{sync::Arc, time::{Duration, SystemTime, UNIX_EPOCH}};
-
-use poise::serenity_prelude::{ChannelId, CreateEmbed, CreateMessage, EditMessage, GuildId, Http, Message, UserId};
+use poise::serenity_prelude::{
+    ChannelId, CreateEmbed, CreateMessage, EditMessage, GuildId, Http, Message, UserId,
+};
+use serenity::{async_trait, CreateActionRow, CreateButton};
+use std::{
+    sync::Arc,
+    time::{Duration, SystemTime, UNIX_EPOCH},
+    vec,
+};
 
 use crate::prelude::*;
 
@@ -15,8 +21,38 @@ pub struct GiveawayOptions {
     pub starts_at: Duration,
     pub ends_at: Duration,
 }
-impl GiveawayOptions {
-    pub fn message_description(&self, entries: &Vec<UserId>) -> String {
+#[async_trait]
+pub trait StartMessage {
+    fn message_description(&self, entries: &Vec<UserId>) -> String;
+    fn embed(&self, entries: &Vec<UserId>) -> CreateEmbed;
+    fn create_message(&self, entries: &Vec<UserId>) -> CreateMessage;
+    fn edit_message(&self, entries: &Vec<UserId>) -> EditMessage;
+    async fn send_message(
+        &self,
+        http: Arc<Http>,
+        channel_id: ChannelId,
+        entries: &Vec<UserId>,
+    ) -> Result<Message, Error>;
+    fn buttons(&self) -> CreateActionRow;
+}
+#[async_trait]
+pub trait EndMessage {
+    fn message_description(&self, entries: &Vec<UserId>, winners: Vec<&UserId>) -> String;
+    fn embed(&self, entries: &Vec<UserId>, winners: Vec<&UserId>) -> CreateEmbed;
+    fn create_message(&self, entries: &Vec<UserId>, winners: Vec<&UserId>) -> CreateMessage;
+    fn edit_message(&self, entries: &Vec<UserId>, winners: Vec<&UserId>) -> EditMessage;
+    async fn send_message(
+        &self,
+        http: Arc<Http>,
+        channel_id: ChannelId,
+        entries: &Vec<UserId>,
+        winners: Vec<&UserId>,
+    ) -> Result<Message, Error>;
+    fn buttons(&self) -> CreateActionRow;
+}
+#[async_trait]
+impl StartMessage for GiveawayOptions {
+    fn message_description(&self, entries: &Vec<UserId>) -> String {
         format!(
             "Prize: {}\nEntries: {}\nWinners: {}\nTime: <t:{3}:R> <t:{3}>",
             self.prize,
@@ -25,33 +61,88 @@ impl GiveawayOptions {
             self.ends_at.as_secs(),
         )
     }
-    pub fn embed(&self, entries: &Vec<UserId>) -> CreateEmbed {
+    fn embed(&self, entries: &Vec<UserId>) -> CreateEmbed {
+        // TODO: get Start message embed config 
         let embed = CreateEmbed::default()
             .title("Giveaway")
-            .description(self.message_description(entries))
-            .color(0x00ff00);
+            .description(StartMessage::message_description(self, entries))
+            .color((255, 0, 0));
 
         embed
     }
-    pub fn create_message(&self, entries: &Vec<UserId>) -> CreateMessage {
-        CreateMessage::new().embed(self.embed(entries))
+    fn create_message(&self, entries: &Vec<UserId>) -> CreateMessage {
+        CreateMessage::new()
+            .embed(StartMessage::embed(self, entries))
+            .components(vec![StartMessage::buttons(self)])
     }
-    pub fn edit_message(&self, entries: &Vec<UserId>) -> EditMessage {
-        EditMessage::new().embed(self.embed(entries))
+    fn buttons(&self) -> CreateActionRow {
+        CreateActionRow::Buttons(vec![CreateButton::new("giveaway").label("Enter")])
     }
-    pub async fn send_message(
+    fn edit_message(&self, entries: &Vec<UserId>) -> EditMessage {
+        EditMessage::new().embed(StartMessage::embed(self, entries))
+    }
+    async fn send_message(
         &self,
         http: Arc<Http>,
         channel_id: ChannelId,
         entries: &Vec<UserId>,
     ) -> Result<Message, Error> {
         Ok(channel_id
-            .send_message(http, self.create_message(entries))
+            .send_message(http, StartMessage::create_message(self, entries))
             .await?)
     }
 }
 
+#[async_trait]
+impl EndMessage for GiveawayOptions {
+    fn message_description(&self, entries: &Vec<UserId>, winners: Vec<&UserId>) -> String {
+        format!(
+            "Prize: {}\nEntries: {}\nWinners: {}\nTime: <t:{3}:R> <t:{3}>",
+            self.prize,
+            entries.len(),
+            winners
+                .iter()
+                .map(|u| format!("<@{}>", u))
+                .collect::<Vec<_>>()
+                .join(", "),
+            self.ends_at.as_secs(),
+        )
+    }
+    fn embed(&self, entries: &Vec<UserId>, winners: Vec<&UserId>) -> CreateEmbed {
+        let embed = CreateEmbed::default()
+            .title("Giveaway")
+            .description(EndMessage::message_description(self, entries, winners))
+            .color(0x00ff00);
 
+        embed
+    }
+    fn create_message(&self, entries: &Vec<UserId>, winners: Vec<&UserId>) -> CreateMessage {
+        CreateMessage::new()
+            .embed(EndMessage::embed(self, entries, winners))
+            .components(vec![EndMessage::buttons(self)])
+    }
+    fn edit_message(&self, entries: &Vec<UserId>, winners: Vec<&UserId>) -> EditMessage {
+        EditMessage::new()
+            .embed(EndMessage::embed(self, entries, winners))
+            .components(vec![EndMessage::buttons(self)])
+    }
+    async fn send_message(
+        &self,
+        http: Arc<Http>,
+        channel_id: ChannelId,
+        entries: &Vec<UserId>,
+        winners: Vec<&UserId>,
+    ) -> Result<Message, Error> {
+        Ok(channel_id
+            .send_message(http, EndMessage::create_message(self, entries, winners))
+            .await?)
+    }
+    fn buttons(&self) -> CreateActionRow {
+        CreateActionRow::Buttons(vec![
+            CreateButton::new_link("https://google.com").label("Giveaway")
+        ])
+    }
+}
 
 impl GiveawayOptions {
     pub fn new(ctx: &Context<'_>, prize: String, winners: u32, timer: Duration) -> Self {

@@ -81,6 +81,7 @@ async fn main() {
     let manager_job = tokio::spawn(async move {
         while let Some(giveaway) = rx.recv().await {
             let cache_http = cache_http.clone();
+            {giveaway.lock().await}.end(cache_http).await.unwrap();
         }
     });
     let client_job = tokio::spawn(async move {
@@ -125,16 +126,14 @@ async fn event_handler(
                 if interaction.data.custom_id.as_str() != "giveaway" {
                     return Ok(());
                 }
-
                 let giveaway_id = interaction.message.id;
-                if let Some(giveaway) = data.manager.giveaways.lock().await.get_mut(&giveaway_id) {
-                    let _ = giveaway
+                println!("giveaway button");
+                if let Some(giveaway) = data.manager.giveaways.get(&giveaway_id) {
+                    println!("giveaway found");
+                    giveaway.lock().await
                         .add_entry(interaction.user.id, ctx.http.clone())
-                        .await;
+                        .await?;
                 };
-                // if let Some(giveaway) = data.manager.lock().await.cache.get_mut(&giveaway_id) {
-                //     giveaway.add_entriy(interaction.user.id, &ctx.http).await;
-                // }
             }
         }
         _ => {}
