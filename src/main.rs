@@ -1,15 +1,13 @@
+use giveaway::manager::GiveawayManager;
 use tokio::sync::mpsc;
 
-use std::{sync::Arc, time::Duration};
-
-use giveaway_manager::GiveawayManager;
 use poise::serenity_prelude::{self as serenity, EditMessage};
+use std::time::Duration;
 use tokio::time::sleep;
 
 mod commands;
-mod giveaway_manager;
+mod giveaway;
 mod prelude;
-use futures::lock::Mutex;
 use prelude::*;
 
 /// If a command is specified, it will display information about that command
@@ -32,7 +30,7 @@ async fn main() {
     let token = "MTI0ODAyNDk4MzMwNTk4MTk2Mg.GMyrcS.zaWcvrrLizzWZ5nBdDUJtJNluRRa0EDpLRB_-U";
     let intents = serenity::GatewayIntents::non_privileged();
     let (tx, mut rx) = mpsc::channel(100);
-    let manager = giveaway_manager::GiveawayManager::new(tx).await;
+    let manager = GiveawayManager::new(tx).await;
     let data = Data { manager };
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
@@ -84,7 +82,18 @@ async fn main() {
         while let Some(giveaway) = rx.recv().await {
             println!("test");
             let cache_http = cache_http.clone();
-            if let Err(error) = giveaway.args.channel_id.edit_message(cache_http, giveaway.message_id, EditMessage::new().content("test")).await {
+            // giveaway.is_ended
+            // giveaway.send_message(cache_http.clone()).await;
+            if let Err(error) = giveaway
+                .args
+                .channel_id
+                .edit_message(
+                    cache_http,
+                    giveaway.message_id,
+                    EditMessage::new().content("test"),
+                )
+                .await
+            {
                 println!("Error: {:?}", error);
             };
         }
@@ -94,7 +103,6 @@ async fn main() {
             println!("Client error: {why:?}");
         }
     });
-    
 
     client_job.await.unwrap();
     manager_job.await.unwrap();
@@ -126,18 +134,24 @@ async fn event_handler(
                 );
             }
         }
-        // serenity::FullEvent::InteractionCreate { interaction } => {
-        //     if let Some(interaction) = interaction.as_message_component() {
-        //         interaction.defer(ctx.http.clone()).await?;
-        //         if interaction.data.custom_id.as_str() != "giveaway" {
-        //             return Ok(())
-        //         }
-        //         let giveaway_id = interaction.message.id;
-        //         if let Some(giveaway) = data.manager.lock().await.cache.get_mut(&giveaway_id) {
-        //             giveaway.add_entriy(interaction.user.id, &ctx.http).await;
-        //         }
-        //     }
-        // }
+        serenity::FullEvent::InteractionCreate { interaction } => {
+            if let Some(interaction) = interaction.as_message_component() {
+                interaction.defer(ctx.http.clone()).await?;
+                if interaction.data.custom_id.as_str() != "giveaway" {
+                    return Ok(());
+                }
+
+                let giveaway_id = interaction.message.id;
+                if let Some(giveaway) = data.manager.giveaways.lock().await.get_mut(&giveaway_id) {
+                    giveaway
+                        .add_entry(interaction.user.id, ctx.http.clone())
+                        .await;
+                };
+                // if let Some(giveaway) = data.manager.lock().await.cache.get_mut(&giveaway_id) {
+                //     giveaway.add_entriy(interaction.user.id, &ctx.http).await;
+                // }
+            }
+        }
         _ => {}
     }
     Ok(())

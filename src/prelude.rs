@@ -1,7 +1,7 @@
 
 use std::sync::Arc;
 
-use crate::giveaway_manager::GiveawayManager;
+use crate::giveaway::manager::GiveawayManager;
 pub struct Data {
 	pub manager: GiveawayManager,
 } 
