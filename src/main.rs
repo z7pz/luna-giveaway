@@ -4,7 +4,10 @@ use once_cell::sync::OnceCell;
 use prisma_client::db::PrismaClient;
 use tokio::sync::mpsc;
 
-use poise::serenity_prelude::{self as serenity};
+use poise::{
+    serenity_prelude::{self as serenity, model::permissions},
+    PrefixFrameworkOptions,
+};
 use std::time::Duration;
 use tokio::time::sleep;
 
@@ -50,7 +53,7 @@ async fn main() {
 
     let token = "MTI0ODAyNDk4MzMwNTk4MTk2Mg.GMyrcS.zaWcvrrLizzWZ5nBdDUJtJNluRRa0EDpLRB_-U";
 
-    let intents = serenity::GatewayIntents::non_privileged();
+    let intents = serenity::GatewayIntents::all();
     let (tx, mut rx) = mpsc::channel(100);
     let manager = GiveawayManager::new(tx).await;
     let data = Data { manager };
@@ -62,16 +65,53 @@ async fn main() {
                 commands::reroll(),
                 help(),
             ],
+            prefix_options: PrefixFrameworkOptions {
+                dynamic_prefix: Some(|ctx| {
+                    Box::pin(async move {
+                        println!("test");
+                        if let Some(id) = ctx.guild_id {
+                            if let Ok(guild) = GuildEntity::new().find_or_create(id).await {
+                                Ok(Some(guild.prefix))
+                            } else {
+                                Ok(None)
+                            }
+                        } else {
+                            // TODO env default prefix
+                            Ok(None)
+                        }
+                    })
+                }),
+                prefix: Some("!".to_string()),
+                ..Default::default()
+            },
             command_check: Some(|ctx| {
                 Box::pin(async move {
+                    if ctx.author().bot {
+                        return Ok(false);
+                    }
                     println!("Checking command: {:?}", ctx.command().name);
+                    
                     if let Some(id) = ctx.guild_id() {
-                        let _guild = GuildEntity::new().find_or_create(id).await?;
+                        let guild = GuildEntity::new().find_or_create(id).await?;
                         // TODO chekc if command is enabled
-                        // TODO check if user has admin permissions
-                        // TODO check if user has roles to play to command
-
-                        Ok(true)
+                        if let Some(member) = ctx.author_member().await {
+                            // check if user has admin permissions
+                            let is_admin = member.permissions(ctx.cache()).map(|p| p.administrator()).unwrap_or(false);
+                            if is_admin {
+                                return Ok(true);
+                            }
+                            // check if user has roles to play to command
+                            let has_role = member.roles.iter().any(|role| {
+                                return guild.creator_roles.contains(&role.to_string())
+                            });
+                            dbg!(has_role);
+                            if has_role {
+                                return Ok(true);
+                            }
+                            return Ok(false);
+                        } else {
+                            return Ok(false);
+                        }
                     } else {
                         Ok(false)
                     }

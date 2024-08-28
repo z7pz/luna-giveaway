@@ -2,8 +2,9 @@
 
 ## Stage 1
 - [X] hydrate from database on restart
+- [X] dynamic prefix
 - [ ] enable/disable commands on check_command
-- [ ] custom roles that have access to the commands and the dashboard
+- [X] custom roles that have access to the commands
 - [ ] custom start embed and end embed
 - [ ] custom end message
 - [ ] pause/resume commands

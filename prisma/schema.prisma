@@ -16,6 +16,7 @@ enum EntryType {
 model Guild {
   id     BigInt @id
   prefix String @default("!")
+  disabled_commands String[] @default([])
 
   // embed settings
   start_embed_settings EmbedSettings @relation(name: "start", fields: [start_embed_settings_id], references: [id])
