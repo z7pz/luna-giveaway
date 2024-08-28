@@ -53,7 +53,6 @@ async fn main() {
     let intents = serenity::GatewayIntents::non_privileged();
     let (tx, mut rx) = mpsc::channel(100);
     let manager = GiveawayManager::new(tx).await;
-    manager.hydrate().await;
     let data = Data { manager };
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
@@ -67,8 +66,11 @@ async fn main() {
                 Box::pin(async move {
                     println!("Checking command: {:?}", ctx.command().name);
                     if let Some(id) = ctx.guild_id() {
-                        sleep(Duration::from_secs(1)).await;
-                        GuildEntity::new().find_or_create(id).await?;
+                        let _guild = GuildEntity::new().find_or_create(id).await?;
+                        // TODO chekc if command is enabled
+                        // TODO check if user has admin permissions
+                        // TODO check if user has roles to play to command
+
                         Ok(true)
                     } else {
                         Ok(false)
@@ -92,6 +94,7 @@ async fn main() {
         })
         .setup(|ctx, _ready, framework| {
             Box::pin(async move {
+                data.manager.hydrate(ctx.http.clone()).await;
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
                 Ok(data)
             })
@@ -131,7 +134,7 @@ async fn main() {
         }
     });
     let client_job = tokio::spawn(async move {
-        if let Err(why) = client.start().await {
+        if let Err(why) = client.start_shards(1).await {
             println!("Client error: {why:?}");
         }
     });

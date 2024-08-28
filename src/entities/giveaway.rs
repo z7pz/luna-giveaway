@@ -21,6 +21,9 @@ impl GiveawayEntity {
     pub fn new() -> Self {
         Self::default()
     }
+    pub async fn find_not_ended(&self) -> Result<Vec<giveaway::Data>, Error> {
+        Ok(self.prisma.giveaway().find_many(vec![giveaway::is_ended::equals(false)]).exec().await?)
+    }
     pub async fn create(&self, giveaway: &Giveaway) -> Result<giveaway::Data, Error> {
         Ok(self
             .prisma
@@ -29,6 +32,7 @@ impl GiveawayEntity {
                 giveaway.message_id.into(),
                 giveaway.options.channel_id.into(),
                 giveaway.options.prize.clone(),
+                giveaway.options.host.clone(),
                 giveaway.options.starts_at.fixed_offset(),
                 giveaway.options.ends_at.fixed_offset(),
                 giveaway.options.winners as i32,

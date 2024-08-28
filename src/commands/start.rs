@@ -30,7 +30,7 @@ pub async fn start(
     }
     ctx.data()
         .manager
-        .create(&ctx, GiveawayOptions::new(&ctx, prize, winners, timer))
+        .create(&ctx, GiveawayOptions::from_ctx(&ctx, prize, winners, timer))
         .await?;
     Ok(())
 }

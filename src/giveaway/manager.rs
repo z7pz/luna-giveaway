@@ -23,10 +23,10 @@ use super::{
 };
 
 pub struct GiveawayManager {
-    entity: Arc<GiveawayEntity>,
     pub tx: Sender<Arc<Mutex<Giveaway>>>,
     pub giveaways: Arc<DashMap<MessageId, Arc<Mutex<Giveaway>>>>,
     pub tasks: Arc<DashMap<MessageId, GiveawayTask>>,
+    entity: Arc<GiveawayEntity>,
 }
 impl GiveawayManager {
     pub async fn new(tx: Sender<Arc<Mutex<Giveaway>>>) -> Self {
@@ -40,6 +40,7 @@ impl GiveawayManager {
             tasks,
         }
     }
+
     pub async fn create(&self, ctx: &Context<'_>, options: GiveawayOptions) -> Result<(), Error> {
         let prisma = get_prisma();
 
@@ -78,10 +79,26 @@ impl GiveawayManager {
     }
     pub fn end(&self) {}
     pub fn reroll(&self) {}
-    pub async fn hydrate(&self) {
-        // get all giveaways from the database
-        // for each giveaway, create a task
-        // if the giveaway is not ended, sleep for the remaining time
-        // if the giveaway is ended, send the giveaway to the tx channel
+    pub async fn hydrate(&self, http: Arc<Http>) {
+        let giveaways = self
+            .entity
+            .find_not_ended()
+            .await
+            .expect("Error finding giveaways");
+        for giveaway in giveaways {
+            let mut giveaway = Giveaway::from_data(giveaway);
+            if giveaway.is_ended {
+                let _ = giveaway.end(http.clone()).await;
+                continue;
+            } else {
+                let giveaway = Arc::new(Mutex::new(giveaway));
+                let task = self
+                    .create_task(giveaway.lock().await.message_id, giveaway.clone())
+                    .await;
+                self.giveaways
+                    .insert(giveaway.lock().await.message_id, giveaway.clone());
+                self.tasks.insert(giveaway.lock().await.message_id, task);
+            }
+        }
     }
 }

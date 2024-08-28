@@ -1,7 +1,7 @@
 # Todo
 
 ## Stage 1
-- [-] hydrate from database on restart
+- [X] hydrate from database on restart
 - [ ] enable/disable commands on check_command
 - [ ] custom roles that have access to the commands and the dashboard
 - [ ] custom start embed and end embed

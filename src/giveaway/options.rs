@@ -1,7 +1,8 @@
-use chrono::{DateTime, Local};
+use chrono::{DateTime, FixedOffset, Local};
 use poise::serenity_prelude::{
     ChannelId, CreateEmbed, CreateMessage, EditMessage, GuildId, Http, Message, UserId,
 };
+use prisma_client::db::giveaway;
 use serenity::{async_trait, CreateActionRow, CreateButton};
 use std::{sync::Arc, time::Duration, vec};
 
@@ -20,14 +21,42 @@ pub struct GiveawayOptions {
 }
 
 impl GiveawayOptions {
-    pub fn new(ctx: &Context<'_>, prize: String, winners: u32, timer: Duration) -> Self {
+    pub fn from_ctx(ctx: &Context<'_>, prize: String, winners: u32, timer: Duration) -> Self {
+        Self::new(
+            ctx.author().to_string(),
+            ctx.channel_id(),
+            ctx.guild_id().expect("Guild not found!"),
+            prize,
+            winners,
+            timer,
+        )
+    }
+    pub fn from_data(giveaway: giveaway::Data) -> Self {
+        let delta = giveaway.end_at.timestamp() - Local::now().fixed_offset().timestamp();
+        Self::new(
+            giveaway.host,
+            ChannelId::new(giveaway.channel_id as u64),
+            GuildId::new(giveaway.guild_id as u64),
+            giveaway.prize,
+            giveaway.winners as u32,
+            Duration::new(if delta < 5 { 0 } else { delta as u64 }, 0),
+        )
+    }
+    pub fn new(
+        host: String,
+        channel_id: ChannelId,
+        guild_id: GuildId,
+        prize: String,
+        winners: u32,
+        timer: Duration,
+    ) -> Self {
         Self {
             prize,
             winners,
             timer,
-            host: ctx.author().to_string(),
-            channel_id: ctx.channel_id(),
-            guild_id: ctx.guild_id().expect("Failed to get the guild id"), // WARN unwrap
+            host,
+            channel_id,
+            guild_id, // WARN unwrap
             starts_at: Local::now(),
             ends_at: Local::now() + timer,
         }

@@ -1,3 +1,4 @@
+use chrono::Local;
 use poise::serenity_prelude::{CacheHttp, Message, MessageId, UserId};
 use prisma_client::db::giveaway;
 use rand::seq::SliceRandom;
@@ -13,6 +14,18 @@ pub struct Giveaway {
     pub options: GiveawayOptions,
     pub entries: Vec<UserId>,
     pub is_ended: bool,
+}
+impl Giveaway {
+    pub fn from_data(giveaway: giveaway::Data) -> Self {
+        let delta = giveaway.end_at.timestamp() - Local::now().fixed_offset().timestamp();
+        Self {
+            entity: GiveawayEntity::new(),
+            message_id: MessageId::new(giveaway.message_id as u64) ,
+            options: GiveawayOptions::from_data(giveaway),
+            entries: vec![],
+            is_ended: delta < 5,
+        }
+    }
 }
 
 impl Giveaway {

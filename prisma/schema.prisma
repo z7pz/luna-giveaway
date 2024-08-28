@@ -54,6 +54,7 @@ model Giveaway {
   guild_id   BigInt
   channel_id BigInt
   prize      String
+  host      String
 
   start_at DateTime
   end_at   DateTime
