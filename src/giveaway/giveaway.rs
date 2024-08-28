@@ -5,7 +5,7 @@ use serenity::EditMessage;
 
 
 use super::options::{EndMessage, GiveawayOptions, StartMessage};
-use crate::{entities::giveaway::GiveawayEntity, prelude::*};
+use crate::{entities::*, prelude::*};
 
 #[derive(Debug)]
 pub struct Giveaway {

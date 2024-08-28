@@ -5,7 +5,7 @@ use std::{
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
-use crate::{entities::giveaway::GiveawayEntity, get_prisma, prelude::*};
+use crate::{entities::*, get_prisma, prelude::*};
 use chrono::{DateTime, Duration as ChronoDuration, Utc};
 use dashmap::DashMap;
 use futures::{lock::Mutex, FutureExt};
@@ -74,7 +74,7 @@ impl GiveawayManager {
     }
     pub fn end(&self) {}
     pub fn reroll(&self) {}
-    pub fn hydrate(&self) {
+    pub async fn hydrate(&self) {
         // get all giveaways from the database
         // for each giveaway, create a task
         // if the giveaway is not ended, sleep for the remaining time

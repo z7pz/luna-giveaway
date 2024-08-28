@@ -1,11 +1,10 @@
-use entities::{giveaway::GiveawayEntity, guild::GuildEntity};
+use entities::*;
 use giveaway::manager::GiveawayManager;
-use log::{info, trace};
 use once_cell::sync::OnceCell;
 use prisma_client::db::PrismaClient;
 use tokio::sync::mpsc;
 
-use poise::serenity_prelude::{self as serenity, EditMessage};
+use poise::serenity_prelude::{self as serenity};
 use std::time::Duration;
 use tokio::time::sleep;
 
@@ -54,6 +53,7 @@ async fn main() {
     let intents = serenity::GatewayIntents::non_privileged();
     let (tx, mut rx) = mpsc::channel(100);
     let manager = GiveawayManager::new(tx).await;
+    manager.hydrate().await;
     let data = Data { manager };
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
@@ -73,7 +73,6 @@ async fn main() {
                     } else {
                         Ok(false)
                     }
-                    
                 })
             }),
             pre_command: |ctx| {
