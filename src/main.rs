@@ -134,7 +134,7 @@ async fn main() {
         }
     });
     let client_job = tokio::spawn(async move {
-        if let Err(why) = client.start_shards(1).await {
+        if let Err(why) = client.start().await {
             println!("Client error: {why:?}");
         }
     });

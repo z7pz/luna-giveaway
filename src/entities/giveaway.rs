@@ -1,4 +1,5 @@
 use prisma_client::db::{giveaway, guild, PrismaClient};
+use serenity::MessageId;
 
 use crate::get_prisma;
 
@@ -42,8 +43,8 @@ impl GiveawayEntity {
             .exec()
             .await?)
     }
-    pub fn end(&self) -> Result<(), Error> {
+    pub async fn end(&self, message_id: &MessageId) -> Result<giveaway::Data, Error> {
         // end giveaway
-        Ok(())
+        Ok(self.prisma.giveaway().update(giveaway::UniqueWhereParam::MessageIdEquals(message_id.clone().into()), vec![giveaway::is_ended::set(true)]).exec().await?)
     }
 }

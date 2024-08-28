@@ -72,6 +72,7 @@ impl Giveaway {
     pub async fn end(&mut self, cache_http: impl CacheHttp) -> Result<Message, Error> {
         self.is_ended = true;
         // TODO send a new message with the winners
+        self.entity.end(&self.message_id).await?;
         self.update_message(
             cache_http,
             EndMessage::edit_message(&self.options, &self.entries, self.get_winners()),

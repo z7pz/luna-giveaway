@@ -85,6 +85,7 @@ impl GiveawayManager {
             .find_not_ended()
             .await
             .expect("Error finding giveaways");
+        println!("Hydrating giveaways: {}", giveaways.len());
         for giveaway in giveaways {
             let mut giveaway = Giveaway::from_data(giveaway);
             if giveaway.is_ended {
@@ -92,12 +93,13 @@ impl GiveawayManager {
                 continue;
             } else {
                 let giveaway = Arc::new(Mutex::new(giveaway));
+                let message_id = giveaway.lock().await.message_id;
                 let task = self
-                    .create_task(giveaway.lock().await.message_id, giveaway.clone())
+                    .create_task(message_id.clone(), giveaway.clone())
                     .await;
                 self.giveaways
-                    .insert(giveaway.lock().await.message_id, giveaway.clone());
-                self.tasks.insert(giveaway.lock().await.message_id, task);
+                    .insert(message_id.clone(), giveaway.clone());
+                self.tasks.insert(message_id, task);
             }
         }
     }
