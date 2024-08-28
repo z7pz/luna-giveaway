@@ -1,5 +1,4 @@
 
-use std::sync::Arc;
 
 use crate::giveaway::manager::GiveawayManager;
 pub struct Data {

@@ -1,13 +1,15 @@
 use poise::serenity_prelude::{CacheHttp, Message, MessageId, UserId};
+use prisma_client::db::giveaway;
 use rand::seq::SliceRandom;
 use serenity::EditMessage;
 
 
 use super::options::{EndMessage, GiveawayOptions, StartMessage};
-use crate::prelude::*;
+use crate::{entities::giveaway::GiveawayEntity, prelude::*};
 
 #[derive(Debug)]
 pub struct Giveaway {
+    entity: GiveawayEntity,
     pub message_id: MessageId,
     pub options: GiveawayOptions,
     pub entries: Vec<UserId>,
@@ -16,6 +18,18 @@ pub struct Giveaway {
 
 
 impl Giveaway {
+    pub fn new(message_id: MessageId, options: GiveawayOptions) -> Self {
+        Self {
+            entity: GiveawayEntity::new(),
+            message_id,
+            options,
+            entries: vec![],
+            is_ended: false,
+        }
+    }
+    pub async fn  save(&self) -> Result<giveaway::Data, Error> {
+        Ok(self.entity.create(&self).await?)
+    }
     pub async fn add_entry(&mut self, user_id: UserId, cache_http: impl CacheHttp) -> Result<Message, Error> {
         println!("Adding entry: {}", user_id);
         if self.is_ended {
@@ -30,6 +44,7 @@ impl Giveaway {
     }
     pub async fn end(&mut self, cache_http: impl CacheHttp) -> Result<Message, Error> {
         self.is_ended = true;
+        // TODO send a new message with the winners
         Ok(self.update_message(cache_http, EndMessage::edit_message(&self.options, &self.entries, self.get_winners())).await?)
     }
     pub fn get_winners(&self) -> Vec<&UserId> {

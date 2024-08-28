@@ -1,3 +1,4 @@
+use chrono::{Date, DateTime, Local, Utc};
 use poise::serenity_prelude::{
     ChannelId, CreateEmbed, CreateMessage, EditMessage, GuildId, Http, Message, UserId,
 };
@@ -18,9 +19,28 @@ pub struct GiveawayOptions {
     pub host: String,
     pub channel_id: ChannelId,
     pub guild_id: GuildId,
-    pub starts_at: Duration,
-    pub ends_at: Duration,
+    pub starts_at: DateTime<Local>,
+    pub ends_at: DateTime<Local>,
 }
+
+
+
+impl GiveawayOptions {
+    pub fn new(ctx: &Context<'_>, prize: String, winners: u32, timer: Duration) -> Self {
+        Self {
+            prize,
+            winners,
+            timer,
+            host: ctx.author().to_string(),
+            channel_id: ctx.channel_id().into(),
+            guild_id: ctx.guild_id().expect("Failed to get the guild id").into(), // WARN unwrap
+            starts_at: Local::now(),
+            ends_at: Local::now() + timer,
+        }
+    }
+}
+
+
 #[async_trait]
 pub trait StartMessage {
     fn message_description(&self, entries: &Vec<UserId>) -> String;
@@ -58,7 +78,7 @@ impl StartMessage for GiveawayOptions {
             self.prize,
             entries.len(),
             self.winners,
-            self.ends_at.as_secs(),
+            self.ends_at.timestamp(),
         )
     }
     fn embed(&self, entries: &Vec<UserId>) -> CreateEmbed {
@@ -105,7 +125,7 @@ impl EndMessage for GiveawayOptions {
                 .map(|u| format!("<@{}>", u))
                 .collect::<Vec<_>>()
                 .join(", "),
-            self.ends_at.as_secs(),
+            self.ends_at.timestamp(),
         )
     }
     fn embed(&self, entries: &Vec<UserId>, winners: Vec<&UserId>) -> CreateEmbed {
@@ -141,25 +161,5 @@ impl EndMessage for GiveawayOptions {
         CreateActionRow::Buttons(vec![
             CreateButton::new_link("https://google.com").label("Giveaway")
         ])
-    }
-}
-
-impl GiveawayOptions {
-    pub fn new(ctx: &Context<'_>, prize: String, winners: u32, timer: Duration) -> Self {
-        let start = SystemTime::now();
-        let since_the_epoch = start
-            .duration_since(UNIX_EPOCH)
-            .expect("Time went backwards");
-
-        Self {
-            prize,
-            winners,
-            timer,
-            host: ctx.author().to_string(),
-            channel_id: ctx.channel_id().into(),
-            guild_id: ctx.guild_id().expect("Failed to get the guild id").into(), // WARN unwrap
-            starts_at: since_the_epoch,
-            ends_at: since_the_epoch + timer,
-        }
     }
 }

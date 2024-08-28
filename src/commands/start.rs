@@ -31,7 +31,7 @@ pub async fn start(
         ctx.reply("Timer must be between 1 minute and 1 week")
             .await?;
         return Ok(());
-    }
+    } 
     ctx.data().manager.create(&ctx, GiveawayOptions::new(&ctx, prize, winners, timer)).await?;
     Ok(())
 }

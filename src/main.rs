@@ -1,4 +1,8 @@
+use entities::{giveaway::GiveawayEntity, guild::GuildEntity};
 use giveaway::manager::GiveawayManager;
+use log::{info, trace};
+use once_cell::sync::OnceCell;
+use prisma_client::db::PrismaClient;
 use tokio::sync::mpsc;
 
 use poise::serenity_prelude::{self as serenity, EditMessage};
@@ -6,9 +10,17 @@ use std::time::Duration;
 use tokio::time::sleep;
 
 mod commands;
+mod entities;
 mod giveaway;
+
 mod prelude;
 use prelude::*;
+
+pub static PRISMA: OnceCell<PrismaClient> = OnceCell::new();
+
+fn get_prisma() -> &'static PrismaClient {
+    PRISMA.get().expect("Prisma client not set")
+}
 
 /// If a command is specified, it will display information about that command
 #[poise::command(slash_command, prefix_command)]
@@ -27,7 +39,18 @@ async fn help(
 
 #[tokio::main]
 async fn main() {
+    let prisma = PrismaClient::_builder()
+        .build()
+        .await
+        .expect("Failed to create Prisma client");
+    println!("Prisma client creating...");
+
+    PRISMA.set(prisma).expect("Failed to set Prisma client");
+
+    println!("Prisma client created");
+
     let token = "MTI0ODAyNDk4MzMwNTk4MTk2Mg.GMyrcS.zaWcvrrLizzWZ5nBdDUJtJNluRRa0EDpLRB_-U";
+
     let intents = serenity::GatewayIntents::non_privileged();
     let (tx, mut rx) = mpsc::channel(100);
     let manager = GiveawayManager::new(tx).await;
@@ -40,6 +63,29 @@ async fn main() {
                 commands::reroll(),
                 help(),
             ],
+            command_check: Some(|ctx| {
+                Box::pin(async move {
+                    println!("Checking command: {:?}", ctx.command().name);
+                    if let Some(id) = ctx.guild_id() {
+                        sleep(Duration::from_secs(1)).await;
+                        GuildEntity::new().find_or_create(id).await?;
+                        Ok(true)
+                    } else {
+                        Ok(false)
+                    }
+                    
+                })
+            }),
+            pre_command: |ctx| {
+                Box::pin(async move {
+                    println!("Command started: {:?}", ctx.command().name);
+                })
+            },
+            post_command: |ctx| {
+                Box::pin(async move {
+                    println!("Command ended: {:?}", ctx.command().name);
+                })
+            },
             event_handler: |ctx, event, framework, data| {
                 Box::pin(event_handler(ctx, event, framework, data))
             },
@@ -81,7 +127,8 @@ async fn main() {
     let manager_job = tokio::spawn(async move {
         while let Some(giveaway) = rx.recv().await {
             let cache_http = cache_http.clone();
-            {giveaway.lock().await}.end(cache_http).await.unwrap();
+            // TODO handle error
+            let _ = giveaway.lock().await.end(cache_http).await;
         }
     });
     let client_job = tokio::spawn(async move {
@@ -130,7 +177,9 @@ async fn event_handler(
                 println!("giveaway button");
                 if let Some(giveaway) = data.manager.giveaways.get(&giveaway_id) {
                     println!("giveaway found");
-                    giveaway.lock().await
+                    giveaway
+                        .lock()
+                        .await
                         .add_entry(interaction.user.id, ctx.http.clone())
                         .await?;
                 };

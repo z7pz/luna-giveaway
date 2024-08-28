@@ -5,6 +5,9 @@ use std::{
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
+use crate::{entities::giveaway::GiveawayEntity, get_prisma, prelude::*};
+use chrono::{DateTime, Duration as ChronoDuration, Utc};
+use dashmap::DashMap;
 use futures::{lock::Mutex, FutureExt};
 use once_cell::sync::OnceCell;
 use poise::serenity_prelude::{
@@ -12,8 +15,6 @@ use poise::serenity_prelude::{
 };
 use serenity::{EditMessage, Message};
 use tokio::{sync::mpsc::Sender, time::sleep};
-use dashmap::DashMap;
-use crate::prelude::*;
 
 use super::{
     giveaway::Giveaway,
@@ -22,23 +23,25 @@ use super::{
 };
 
 pub struct GiveawayManager {
+    entity: Arc<GiveawayEntity>,
     pub tx: Sender<Arc<Mutex<Giveaway>>>,
-    pub giveaways: DashMap<MessageId, Arc<Mutex<Giveaway>>>,
-    pub tasks: DashMap<MessageId, GiveawayTask>,
+    pub giveaways: Arc<DashMap<MessageId, Arc<Mutex<Giveaway>>>>,
+    pub tasks: Arc<DashMap<MessageId, GiveawayTask>>,
 }
 impl GiveawayManager {
     pub async fn new(tx: Sender<Arc<Mutex<Giveaway>>>) -> Self {
-        let giveaways = DashMap::new();
-        let tasks = DashMap::new();
-
+        let giveaways = Arc::new(DashMap::new());
+        let tasks = Arc::new(DashMap::new());
+        let entity = Arc::new(GiveawayEntity::new());
         Self {
+            entity,
             tx,
             giveaways,
             tasks,
         }
     }
     pub async fn create(&self, ctx: &Context<'_>, options: GiveawayOptions) -> Result<(), Error> {
-        let tx = self.tx.clone();
+        let prisma = get_prisma();
 
         // sending giveaway start message
         let message = options
@@ -49,33 +52,25 @@ impl GiveawayManager {
             )
             .await?;
 
-        let giveaway = Arc::new(Mutex::new(Giveaway {
-            message_id: message.id,
-            options,
-            is_ended: false,
-            entries: vec![],
-        }));
+        let giveaway = Giveaway::new(message.id.clone(), options);
+
+        if let Err(err) = giveaway.save().await {
+            println!("Creating giveaway entity error: {err:?}");
+            return Err(err);
+        };
+
+        let giveaway = Arc::new(Mutex::new(giveaway));
 
         // spawn a task to send giveaway to the tx channel when giveaway ends
-        let g = giveaway.clone();
-        let timer = {giveaway.lock().await}.options.timer;
-        let giveaways = self.giveaways.clone();
-        let task = tokio::spawn(async move {
-            sleep(timer).await;
-            {
-                let g = g.lock().await;
-                giveaways.remove(&g.message_id);
-                println!("{}", giveaways.len())
-            }
-            if let Err(error) = tx.send(g).await {
-                println!("Error: {:?}", error);
-            };
-        });
-        self.giveaways
-            .insert(message.id, giveaway.clone());
-        self.tasks
-            .insert(message.id, GiveawayTask { giveaway, task });
+
+        let task = self.create_task(message.id, giveaway.clone()).await;
+
+        self.giveaways.insert(message.id, giveaway.clone());
+        self.tasks.insert(message.id, task);
         Ok(())
+    }
+    async fn create_task(&self, message_id: MessageId, giveaway: Arc<Mutex<Giveaway>>) -> GiveawayTask {
+        GiveawayTask::create_task(self, message_id, giveaway.clone()).await
     }
     pub fn end(&self) {}
     pub fn reroll(&self) {}
