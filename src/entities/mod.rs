@@ -1,7 +1,6 @@
-mod guild;
-mod giveaway;
 mod embed_settings;
+mod giveaway;
+mod guild;
 
-pub use guild::*;
 pub use giveaway::*;
-pub use embed_settings::*;
+pub use guild::*;

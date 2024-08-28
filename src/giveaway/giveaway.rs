@@ -26,7 +26,7 @@ impl Giveaway {
         }
     }
     pub async fn save(&self) -> Result<giveaway::Data, Error> {
-        Ok(self.entity.create(&self).await?)
+        self.entity.create(self).await
     }
     pub async fn add_entry(
         &mut self,
@@ -39,12 +39,11 @@ impl Giveaway {
         }
         self.entries.push(user_id);
         println!("Added entry: {}", user_id);
-        Ok(self
-            .update_message(
-                cache_http,
-                StartMessage::edit_message(&self.options, &self.entries),
-            )
-            .await?)
+        self.update_message(
+            cache_http,
+            StartMessage::edit_message(&self.options, &self.entries),
+        )
+        .await
     }
     pub async fn update_message(
         &self,
@@ -60,12 +59,11 @@ impl Giveaway {
     pub async fn end(&mut self, cache_http: impl CacheHttp) -> Result<Message, Error> {
         self.is_ended = true;
         // TODO send a new message with the winners
-        Ok(self
-            .update_message(
-                cache_http,
-                EndMessage::edit_message(&self.options, &self.entries, self.get_winners()),
-            )
-            .await?)
+        self.update_message(
+            cache_http,
+            EndMessage::edit_message(&self.options, &self.entries, self.get_winners()),
+        )
+        .await
     }
     pub fn get_winners(&self) -> Vec<&UserId> {
         self.entries

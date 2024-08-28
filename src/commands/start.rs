@@ -1,10 +1,6 @@
-use std::{
-    borrow::BorrowMut,
-    sync::Arc,
-    time::{Duration, SystemTime, UNIX_EPOCH},
-};
+use std::time::Duration;
 
-use crate::{giveaway::{manager::GiveawayManager, options::GiveawayOptions}, prelude::*};
+use crate::{giveaway::options::GiveawayOptions, prelude::*};
 
 /// Create a giveaway command with prize, winners, and timer as arguments
 #[poise::command(slash_command, prefix_command)]
@@ -31,7 +27,10 @@ pub async fn start(
         ctx.reply("Timer must be between 1 minute and 1 week")
             .await?;
         return Ok(());
-    } 
-    ctx.data().manager.create(&ctx, GiveawayOptions::new(&ctx, prize, winners, timer)).await?;
+    }
+    ctx.data()
+        .manager
+        .create(&ctx, GiveawayOptions::new(&ctx, prize, winners, timer))
+        .await?;
     Ok(())
 }

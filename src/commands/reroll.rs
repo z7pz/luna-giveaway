@@ -8,6 +8,5 @@ pub async fn reroll(
     ctx: Context<'_>,
     #[description = "Giveaway message id"] message_id: MessageId,
 ) -> Result<(), Error> {
-
     Ok(())
 }

@@ -52,7 +52,7 @@ impl GiveawayManager {
             )
             .await?;
 
-        let giveaway = Giveaway::new(message.id.clone(), options);
+        let giveaway = Giveaway::new(message.id, options);
 
         if let Err(err) = giveaway.save().await {
             println!("Creating giveaway entity error: {err:?}");
@@ -69,7 +69,11 @@ impl GiveawayManager {
         self.tasks.insert(message.id, task);
         Ok(())
     }
-    async fn create_task(&self, message_id: MessageId, giveaway: Arc<Mutex<Giveaway>>) -> GiveawayTask {
+    async fn create_task(
+        &self,
+        message_id: MessageId,
+        giveaway: Arc<Mutex<Giveaway>>,
+    ) -> GiveawayTask {
         GiveawayTask::create_task(self, message_id, giveaway.clone()).await
     }
     pub fn end(&self) {}

@@ -22,16 +22,21 @@ impl GiveawayEntity {
         Self::default()
     }
     pub async fn create(&self, giveaway: &Giveaway) -> Result<giveaway::Data, Error> {
-        Ok(self.prisma.giveaway().create(
-            giveaway.message_id.into(),
-            giveaway.options.channel_id.into(),
-            giveaway.options.prize.clone(),
-            giveaway.options.starts_at.fixed_offset(),
-            giveaway.options.ends_at.fixed_offset(),
-            giveaway.options.winners as i32,
-            guild::UniqueWhereParam::IdEquals(giveaway.options.guild_id.into()),
-            vec![],
-        ).exec().await?)
+        Ok(self
+            .prisma
+            .giveaway()
+            .create(
+                giveaway.message_id.into(),
+                giveaway.options.channel_id.into(),
+                giveaway.options.prize.clone(),
+                giveaway.options.starts_at.fixed_offset(),
+                giveaway.options.ends_at.fixed_offset(),
+                giveaway.options.winners as i32,
+                guild::UniqueWhereParam::IdEquals(giveaway.options.guild_id.into()),
+                vec![],
+            )
+            .exec()
+            .await?)
     }
     pub fn end(&self) -> Result<(), Error> {
         // end giveaway

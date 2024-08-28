@@ -1,4 +1,4 @@
-use prisma_client::db::{embed_settings, giveaway, guild, PrismaClient};
+use prisma_client::db::{embed_settings, PrismaClient};
 
 use crate::get_prisma;
 
@@ -21,6 +21,6 @@ impl EmbedSettingsEntity {
         Self::default()
     }
     pub async fn create(&self) -> Result<embed_settings::Data, Error> {
-		Ok(self.prisma.embed_settings().create(vec![]).exec().await?)
+        Ok(self.prisma.embed_settings().create(vec![]).exec().await?)
     }
 }

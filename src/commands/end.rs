@@ -1,7 +1,6 @@
-use prisma_client::db::giveaway;
 use serenity::MessageId;
 
-use crate::{prelude::*};
+use crate::prelude::*;
 
 /// Create a giveaway command with prize, winners, and timer as arguments
 #[poise::command(slash_command, prefix_command)]
@@ -11,7 +10,11 @@ pub async fn end(
 ) -> Result<(), Error> {
     if let Some(giveaway) = ctx.data().manager.giveaways.get_mut(&message_id) {
         // TODO move this into the manager so it can be done in the background and remove giveaway cache and task
-        giveaway.lock().await.end(ctx.serenity_context().http.clone()).await?;
+        giveaway
+            .lock()
+            .await
+            .end(ctx.serenity_context().http.clone())
+            .await?;
     }
     Ok(())
 }

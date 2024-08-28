@@ -25,24 +25,27 @@ impl GuildEntity {
     pub fn new() -> Self {
         Self::default()
     }
-	pub async fn test(&self) {
-
-	}
+    pub async fn test(&self) {}
     pub async fn find_or_create(&self, guild_id: GuildId) -> Result<guild::Data, Error> {
-        Ok(self.prisma.guild().upsert(
-            guild::UniqueWhereParam::IdEquals(guild_id.into()),
-            (
-                guild_id.into(),
-                embed_settings::UniqueWhereParam::IdEquals(
-                    self.embed_settings_entity.create().await?.id,
-                ),
-                embed_settings::UniqueWhereParam::IdEquals(
-                    self.embed_settings_entity.create().await?.id,
+        Ok(self
+            .prisma
+            .guild()
+            .upsert(
+                guild::UniqueWhereParam::IdEquals(guild_id.into()),
+                (
+                    guild_id.into(),
+                    embed_settings::UniqueWhereParam::IdEquals(
+                        self.embed_settings_entity.create().await?.id,
+                    ),
+                    embed_settings::UniqueWhereParam::IdEquals(
+                        self.embed_settings_entity.create().await?.id,
+                    ),
+                    vec![],
                 ),
                 vec![],
-            ),
-            vec![],
-        ).exec().await?)
+            )
+            .exec()
+            .await?)
     }
 
     pub async fn create(&self, guild_id: GuildId) -> Result<guild::Data, Error> {

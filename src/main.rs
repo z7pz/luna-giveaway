@@ -29,7 +29,7 @@ async fn help(
 ) -> Result<(), Error> {
     poise::builtins::help(
         ctx,
-        command.as_ref().map(|c| c.as_str()),
+        command.as_deref(),
         poise::builtins::HelpConfiguration::default(),
     )
     .await?;
