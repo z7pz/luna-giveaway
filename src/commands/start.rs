@@ -1,10 +1,6 @@
-use std::{
-    borrow::BorrowMut,
-    sync::Arc,
-    time::{Duration, SystemTime, UNIX_EPOCH},
-};
+use std::time::Duration;
 
-use crate::prelude::*;
+use crate::{giveaway::options::GiveawayOptions, prelude::*};
 
 /// Create a giveaway command with prize, winners, and timer as arguments
 #[poise::command(slash_command, prefix_command)]
@@ -32,8 +28,9 @@ pub async fn start(
             .await?;
         return Ok(());
     }
-    // we dont want to throw if error happened
-    let _ = ctx.data().manager.lock().await.create_giveaway(&ctx, prize, winners, timer).await;
-
+    ctx.data()
+        .manager
+        .create(&ctx, GiveawayOptions::from_ctx(&ctx, prize, winners, timer))
+        .await?;
     Ok(())
 }

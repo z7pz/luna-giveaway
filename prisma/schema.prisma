@@ -1,6 +1,6 @@
 datasource db {
-  provider = "sqlite"
-  url      = "file:../dev.db"
+  provider = "postgres"
+  url      = "postgresql://admin:root@localhost:5432/test_db"
 }
 
 generator client {
@@ -8,30 +8,41 @@ generator client {
   output   = "../prisma_client/src/db.rs"
 }
 
+enum EntryType {
+  Reaction
+  Button
+}
+
 model Guild {
-  id     String @id
-  name   String
-  prefix String
+  id     BigInt @id
+  prefix String @default("!")
+  disabled_commands String[] @default([])
 
   // embed settings
-  start_embed_settings EmbedSettings @relation(name: "start", fields: [start_embed_settings_id], references: [id]) 
-  end_embed_settings   EmbedSettings @relation(name: "end", fields: [end_embed_settings_id], references: [id]) 
+  start_embed_settings EmbedSettings @relation(name: "start", fields: [start_embed_settings_id], references: [id])
+  end_embed_settings   EmbedSettings @relation(name: "end", fields: [end_embed_settings_id], references: [id])
 
-  created_at              DateTime @default(now())
-  updated_at              DateTime @updatedAt
-  
-  end_embed_settings_id   String   @unique
-  start_embed_settings_id String   @unique
+  entry_type    EntryType @default(Button)
+  creator_roles String[]  @default([])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  end_embed_settings_id   String @unique
+  start_embed_settings_id String @unique
+
+  giveaways Giveaway[]
 }
 
 model EmbedSettings {
-  id          String @id
+  id String @id @default(uuid())
+
   // embed settings
-  color       String
-  title       String
-  description String
-  image       String
-  thumbnail   String
+  color       String @default("0x000000")
+  title       String @default("{{prize}}")
+  description String @default("{{description}}")
+  image       String @default("")
+  thumbnail   String @default("")
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -39,5 +50,21 @@ model EmbedSettings {
   end        Guild?   @relation(name: "end")
 }
 
+model Giveaway {
+  message_id BigInt @id
+  guild_id   BigInt
+  channel_id BigInt
+  prize      String
+  host      String
 
+  start_at DateTime
+  end_at   DateTime
 
+  winners  Int
+  is_ended Boolean @default(false)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  guild Guild @relation(fields: [guild_id], references: [id])
+}
