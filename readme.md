@@ -3,21 +3,25 @@
 ## Stage 1
 - [X] hydrate from database on restart
 - [X] dynamic prefix
-- [ ] enable/disable commands on check_command
+- [X] enable/disable commands on check_command
 - [X] custom roles that have access to the commands
 - [ ] custom start embed and end embed
 - [ ] custom end message
-- [ ] pause/resume commands
+- [ ] reaction
 
 
 ## Stage 2
-- [ ] create API
+- [ ] Create API
 - [ ] Discord auth
 	- /login
 	- /redirect?code
 	- user
 	- guilds
 
+## Stage 3
+- [ ] pause/resume commands
+- [ ] webhook
+- [ ] debounce
 
 # Bugs
 No bugs reported

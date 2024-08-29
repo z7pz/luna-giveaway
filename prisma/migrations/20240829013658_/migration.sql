@@ -3,9 +3,9 @@ CREATE TYPE "EntryType" AS ENUM ('Reaction', 'Button');
 
 -- CreateTable
 CREATE TABLE "Guild" (
-    "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "prefix" TEXT NOT NULL,
+    "id" BIGINT NOT NULL,
+    "prefix" TEXT NOT NULL DEFAULT '!',
+    "disabled_commands" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "entry_type" "EntryType" NOT NULL DEFAULT 'Button',
     "creator_roles" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -32,12 +32,11 @@ CREATE TABLE "EmbedSettings" (
 
 -- CreateTable
 CREATE TABLE "Giveaway" (
-    "id" TEXT NOT NULL,
-    "guild_id" TEXT NOT NULL,
-    "channel_id" TEXT NOT NULL,
-    "message_id" TEXT NOT NULL,
+    "message_id" BIGINT NOT NULL,
+    "guild_id" BIGINT NOT NULL,
+    "channel_id" BIGINT NOT NULL,
     "prize" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
+    "host" TEXT NOT NULL,
     "start_at" TIMESTAMP(3) NOT NULL,
     "end_at" TIMESTAMP(3) NOT NULL,
     "winners" INTEGER NOT NULL,
@@ -45,7 +44,7 @@ CREATE TABLE "Giveaway" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Giveaway_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Giveaway_pkey" PRIMARY KEY ("message_id")
 );
 
 -- CreateIndex

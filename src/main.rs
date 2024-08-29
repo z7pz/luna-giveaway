@@ -1,8 +1,9 @@
+use axum::{response::{IntoResponse, Response}, routing::get, Router};
 use entities::*;
 use giveaway::manager::GiveawayManager;
 use once_cell::sync::OnceCell;
 use prisma_client::db::PrismaClient;
-use tokio::sync::mpsc;
+use tokio::{net::TcpListener, sync::mpsc};
 
 use poise::{
     serenity_prelude::{self as serenity, model::permissions},
@@ -56,6 +57,8 @@ async fn main() {
     let intents = serenity::GatewayIntents::all();
     let (tx, mut rx) = mpsc::channel(100);
     let manager = GiveawayManager::new(tx).await;
+
+
     let data = Data { manager };
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
@@ -92,8 +95,11 @@ async fn main() {
                     println!("Checking command: {:?}", ctx.command().name);
                     
                     if let Some(id) = ctx.guild_id() {
-                        let guild = GuildEntity::new().find_or_create(id).await?;
-                        // TODO chekc if command is enabled
+                        let entity = GuildEntity::new();
+                        let guild = entity.find_or_create(id).await?;
+                        if guild.disabled_commands.contains(&ctx.command().name) {
+                            return Ok(false);
+                        };
                         if let Some(member) = ctx.author_member().await {
                             // check if user has admin permissions
                             let is_admin = member.permissions(ctx.cache()).map(|p| p.administrator()).unwrap_or(false);
@@ -104,7 +110,6 @@ async fn main() {
                             let has_role = member.roles.iter().any(|role| {
                                 return guild.creator_roles.contains(&role.to_string())
                             });
-                            dbg!(has_role);
                             if has_role {
                                 return Ok(true);
                             }
@@ -173,6 +178,10 @@ async fn main() {
             let _ = giveaway.lock().await.end(cache_http).await;
         }
     });
+    let app = Router::new().route("/", get(|| async { "Hello, World!" }));
+    tokio::spawn(async move {
+        axum::serve(TcpListener::bind("127.0.0.1:3000").await.expect("error binding"), app.into_make_service()).await.unwrap();
+    });
     let client_job = tokio::spawn(async move {
         if let Err(why) = client.start().await {
             println!("Client error: {why:?}");
@@ -230,4 +239,8 @@ async fn event_handler(
         _ => {}
     }
     Ok(())
+}
+
+async fn hello_route() -> Result<Response, Error> {
+        Ok("Hello, World!".into_response())
 }
