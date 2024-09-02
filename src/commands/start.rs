@@ -1,6 +1,21 @@
-use std::time::Duration;
+use std::{marker::PhantomData, str::FromStr, time::Duration};
+
+use axum::async_trait;
+use poise::PopArgumentHack;
+use prisma_client::db::guild::entry_type;
 
 use crate::{giveaway::options::GiveawayOptions, prelude::*};
+
+
+
+#[derive(poise::ChoiceParameter, PartialEq)]
+pub enum EntryType {
+    #[name = "reaction"]
+    Reaction,
+    // A choice can have multiple names
+    #[name = "button"]
+    Button,
+}
 
 /// Create a giveaway command with prize, winners, and timer as arguments
 #[poise::command(slash_command, prefix_command)]
@@ -9,6 +24,7 @@ pub async fn start(
     #[description = "Choose a prize"] prize: String,
     #[description = "number of winners"] winners: u32,
     #[description = "timer"] timer: String,
+    #[description = "type"] entry_type: Option<EntryType>,
 ) -> Result<(), Error> {
     // check winners if is 0
     if winners == 0 {
@@ -30,7 +46,7 @@ pub async fn start(
     }
     ctx.data()
         .manager
-        .create(&ctx, GiveawayOptions::from_ctx(&ctx, prize, winners, timer))
+        .create(&ctx, GiveawayOptions::from_ctx(&ctx, prize, winners, timer, entry_type).await)
         .await?;
     Ok(())
 }

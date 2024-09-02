@@ -7,7 +7,6 @@ use serenity::EditMessage;
 use super::options::{EndMessage, GiveawayOptions, StartMessage};
 use crate::{entities::*, prelude::*};
 
-#[derive(Debug)]
 pub struct Giveaway {
     entity: GiveawayEntity,
     pub message_id: MessageId,
@@ -16,12 +15,12 @@ pub struct Giveaway {
     pub is_ended: bool,
 }
 impl Giveaway {
-    pub fn from_data(giveaway: giveaway::Data) -> Self {
+    pub async  fn from_data(giveaway: giveaway::Data) -> Self {
         let delta = giveaway.end_at.timestamp() - Local::now().fixed_offset().timestamp();
         Self {
             entity: GiveawayEntity::new(),
             message_id: MessageId::new(giveaway.message_id as u64) ,
-            options: GiveawayOptions::from_data(giveaway),
+            options: GiveawayOptions::from_data(giveaway).await,
             entries: vec![],
             is_ended: delta < 5,
         }
@@ -50,7 +49,12 @@ impl Giveaway {
         if self.is_ended {
             return Err("Giveaway has ended".into());
         }
+        if self.entries.contains(&user_id) {
+            return Err("You have already entered the giveaway".into());
+        }
+
         self.entries.push(user_id);
+        
         println!("Added entry: {}", user_id);
         self.update_message(
             cache_http,

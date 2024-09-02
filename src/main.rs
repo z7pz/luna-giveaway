@@ -1,18 +1,29 @@
-use axum::{response::{IntoResponse, Response}, routing::get, Router};
+#[macro_use]
+extern crate lazy_static;
+use axum::{
+    response::{IntoResponse, Response},
+    routing::get,
+    Router,
+};
+use config::{DEFAULT_PREFIX, DISCORD_TOKEN, PORT};
 use entities::*;
 use giveaway::manager::GiveawayManager;
 use once_cell::sync::OnceCell;
-use prisma_client::db::PrismaClient;
+use prisma_client::db::{EntryType, PrismaClient};
 use tokio::{net::TcpListener, sync::mpsc};
 
 use poise::{
-    serenity_prelude::{self as serenity, model::permissions},
+    serenity_prelude::{
+        self as serenity, CreateInteractionResponse, CreateInteractionResponseMessage,
+    },
     PrefixFrameworkOptions,
 };
-use std::time::Duration;
+use std::{ops::Deref, time::Duration};
 use tokio::time::sleep;
 
+mod routes;
 mod commands;
+mod config;
 mod entities;
 mod giveaway;
 
@@ -51,15 +62,12 @@ async fn main() {
     PRISMA.set(prisma).expect("Failed to set Prisma client");
 
     println!("Prisma client created");
-
-    let token = "MTI0ODAyNDk4MzMwNTk4MTk2Mg.GMyrcS.zaWcvrrLizzWZ5nBdDUJtJNluRRa0EDpLRB_-U";
-
     let intents = serenity::GatewayIntents::all();
     let (tx, mut rx) = mpsc::channel(100);
     let manager = GiveawayManager::new(tx).await;
 
-
     let data = Data { manager };
+    let router_data = data.clone();
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
             commands: vec![
@@ -73,18 +81,17 @@ async fn main() {
                     Box::pin(async move {
                         println!("test");
                         if let Some(id) = ctx.guild_id {
-                            if let Ok(guild) = GuildEntity::new().find_or_create(id).await {
+                            if let Ok(guild) = GuildEntity::new(id).find_or_create().await {
                                 Ok(Some(guild.prefix))
                             } else {
                                 Ok(None)
                             }
                         } else {
-                            // TODO env default prefix
                             Ok(None)
                         }
                     })
                 }),
-                prefix: Some("!".to_string()),
+                prefix: Some(DEFAULT_PREFIX.deref().clone()),
                 ..Default::default()
             },
             command_check: Some(|ctx| {
@@ -93,23 +100,27 @@ async fn main() {
                         return Ok(false);
                     }
                     println!("Checking command: {:?}", ctx.command().name);
-                    
+
                     if let Some(id) = ctx.guild_id() {
-                        let entity = GuildEntity::new();
-                        let guild = entity.find_or_create(id).await?;
+                        let entity = GuildEntity::new(id);
+                        let guild = entity.find_or_create().await?;
                         if guild.disabled_commands.contains(&ctx.command().name) {
                             return Ok(false);
                         };
                         if let Some(member) = ctx.author_member().await {
                             // check if user has admin permissions
-                            let is_admin = member.permissions(ctx.cache()).map(|p| p.administrator()).unwrap_or(false);
+                            let is_admin = member
+                                .permissions(ctx.cache())
+                                .map(|p| p.administrator())
+                                .unwrap_or(false);
                             if is_admin {
                                 return Ok(true);
                             }
                             // check if user has roles to play to command
-                            let has_role = member.roles.iter().any(|role| {
-                                return guild.creator_roles.contains(&role.to_string())
-                            });
+                            let has_role = member
+                                .roles
+                                .iter()
+                                .any(|role| return guild.creator_roles.contains(&role.to_string()));
                             if has_role {
                                 return Ok(true);
                             }
@@ -146,7 +157,7 @@ async fn main() {
         })
         .build();
 
-    let client = serenity::ClientBuilder::new(token, intents)
+    let client = serenity::ClientBuilder::new(&*DISCORD_TOKEN, intents)
         .framework(framework)
         .await;
 
@@ -178,9 +189,22 @@ async fn main() {
             let _ = giveaway.lock().await.end(cache_http).await;
         }
     });
-    let app = Router::new().route("/", get(|| async { "Hello, World!" }));
+    
+     let app = routes::mount(Router::new(), router_data.clone())
+        // .layer(layer)
+        .with_state(router_data);
+    
+    // let app = Router::new().route("/", get(|| async { "Hello, World!" }));
+    
     tokio::spawn(async move {
-        axum::serve(TcpListener::bind("127.0.0.1:3000").await.expect("error binding"), app.into_make_service()).await.unwrap();
+        axum::serve(
+            TcpListener::bind(format!("127.0.0.1:{}", *PORT))
+                .await
+                .expect("error binding"),
+            app.into_make_service(),
+        )
+        .await
+        .unwrap();
     });
     let client_job = tokio::spawn(async move {
         if let Err(why) = client.start().await {
@@ -195,10 +219,33 @@ async fn main() {
 async fn event_handler(
     ctx: &serenity::Context,
     event: &serenity::FullEvent,
-    framework: poise::FrameworkContext<'_, Data, Error>,
+    _framework: poise::FrameworkContext<'_, Data, Error>,
     data: &Data,
 ) -> Result<(), Error> {
     match event {
+        serenity::FullEvent::ReactionAdd { add_reaction } => {
+            // chekc if reaction on embed
+            if let Some(giveaway) = data.manager.giveaways.get(&add_reaction.message_id) {
+                let mut giveaway = giveaway.lock().await;
+                // check if the giveaway is reaction type
+                println!("Reaction add");
+                if giveaway.options.guild.entry_type == EntryType::Reaction {
+                    if giveaway.options.guild.reaction == add_reaction.emoji.as_data() {
+                        println!("Adding entry: {:?}", add_reaction.user_id);
+                        if let Some(id) = add_reaction.user_id {
+                            giveaway.add_entry(id, ctx.http.clone()).await?;
+                        } else {
+                            println!("No user id");
+                        }
+                    } else {
+                        println!("{}", add_reaction.emoji.as_data());
+                        println!("Wrong reaction");
+                    }
+                }
+            } else {
+                println!("No giveaway found");
+            }
+        }
         serenity::FullEvent::Ready { data_about_bot, .. } => {
             if let Some(shard) = data_about_bot.shard {
                 // Note that array index 0 is 0-indexed, while index 1 is 1-indexed.
@@ -220,7 +267,6 @@ async fn event_handler(
         }
         serenity::FullEvent::InteractionCreate { interaction } => {
             if let Some(interaction) = interaction.as_message_component() {
-                interaction.defer(ctx.http.clone()).await?;
                 if interaction.data.custom_id.as_str() != "giveaway" {
                     return Ok(());
                 }
@@ -228,11 +274,24 @@ async fn event_handler(
                 println!("giveaway button");
                 if let Some(giveaway) = data.manager.giveaways.get(&giveaway_id) {
                     println!("giveaway found");
-                    giveaway
+                    if let Err(error) = giveaway
                         .lock()
                         .await
                         .add_entry(interaction.user.id, ctx.http.clone())
-                        .await?;
+                        .await
+                    {
+                        interaction
+                            .create_response(
+                                ctx.http.clone(),
+                                CreateInteractionResponse::Message(
+                                    CreateInteractionResponseMessage::new()
+                                        .content(error.to_string())
+                                        .ephemeral(true),
+                                ),
+                            )
+                            .await?;
+                    }
+                    interaction.defer(ctx.http.clone()).await?;
                 };
             }
         }
@@ -241,6 +300,3 @@ async fn event_handler(
     Ok(())
 }
 
-async fn hello_route() -> Result<Response, Error> {
-        Ok("Hello, World!".into_response())
-}

@@ -1,4 +1,5 @@
 use prisma_client::db::{embed_settings, PrismaClient};
+use serenity::GuildId;
 
 use crate::get_prisma;
 

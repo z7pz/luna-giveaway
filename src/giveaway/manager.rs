@@ -1,4 +1,3 @@
-#![allow(unused)]
 use std::{
     collections::HashMap,
     sync::Arc,
@@ -22,6 +21,7 @@ use super::{
     task::GiveawayTask,
 };
 
+#[derive(Clone)]
 pub struct GiveawayManager {
     pub tx: Sender<Arc<Mutex<Giveaway>>>,
     pub giveaways: Arc<DashMap<MessageId, Arc<Mutex<Giveaway>>>>,
@@ -42,7 +42,6 @@ impl GiveawayManager {
     }
 
     pub async fn create(&self, ctx: &Context<'_>, options: GiveawayOptions) -> Result<(), Error> {
-        let prisma = get_prisma();
 
         // sending giveaway start message
         let message = options
@@ -87,9 +86,12 @@ impl GiveawayManager {
             .expect("Error finding giveaways");
         println!("Hydrating giveaways: {}", giveaways.len());
         for giveaway in giveaways {
-            let mut giveaway = Giveaway::from_data(giveaway);
+            let mut giveaway = Giveaway::from_data(giveaway).await;
             if giveaway.is_ended {
-                let _ = giveaway.end(http.clone()).await;
+                let h = http.clone();
+                tokio::spawn(async move {
+                    let _ = giveaway.end(h).await;
+                });
                 continue;
             } else {
                 let giveaway = Arc::new(Mutex::new(giveaway));

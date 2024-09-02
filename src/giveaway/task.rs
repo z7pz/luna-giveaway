@@ -11,6 +11,8 @@ use super::{giveaway::Giveaway, manager::GiveawayManager};
 pub struct GiveawayTask {
     pub giveaway: Arc<Mutex<Giveaway>>,
     pub task: JoinHandle<()>,
+
+    // todo pause
 }
 
 impl GiveawayTask {
@@ -28,12 +30,16 @@ impl GiveawayTask {
         Self {
             giveaway: giveaway.clone(),
             task: tokio::spawn(async move {
+            
                 sleep(timer).await;
+        
                 if let Err(error) = tx.send(g).await {
                     println!("Error: {:?}", error);
                 };
+        
                 giveaways.remove(&message_id);
                 tasks.remove(&message_id);
+
             }),
         }
     }

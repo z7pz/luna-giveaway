@@ -14,8 +14,8 @@ enum EntryType {
 }
 
 model Guild {
-  id     BigInt @id
-  prefix String @default("!")
+  id                BigInt   @id
+  prefix            String   @default("!")
   disabled_commands String[] @default([])
 
   // embed settings
@@ -23,6 +23,7 @@ model Guild {
   end_embed_settings   EmbedSettings @relation(name: "end", fields: [end_embed_settings_id], references: [id])
 
   entry_type    EntryType @default(Button)
+  reaction      String    @default("")
   creator_roles String[]  @default([])
 
   created_at DateTime @default(now())
@@ -40,7 +41,7 @@ model EmbedSettings {
   // embed settings
   color       String @default("0x000000")
   title       String @default("{{prize}}")
-  description String @default("{{description}}")
+  description String @default("Prize: {{prize}}\nEntries: {{entries_count}}\nWinners: {{winners}}\nTime: {{timer}} {{ends_at}}")
   image       String @default("")
   thumbnail   String @default("")
 
@@ -55,7 +56,7 @@ model Giveaway {
   guild_id   BigInt
   channel_id BigInt
   prize      String
-  host      String
+  host       String
 
   start_at DateTime
   end_at   DateTime

@@ -1,4 +1,5 @@
 use crate::giveaway::manager::GiveawayManager;
+#[derive(Clone)]
 pub struct Data {
     pub manager: GiveawayManager,
 }
