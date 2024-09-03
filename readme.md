@@ -42,13 +42,16 @@
 
 # Routes
 ### Server only
-- [ ] GET /server/:id/settings to get all server's settings
+- [X] GET /server/:id/settings to get all server's settings
+- [X] GET /server/:id/commands to get all server's commands
 - [ ] POST /server/:id/settings to set settings to the server
-- [ ] GET /server/:id/giveaways to list all giveaways
+- [X] GET /server/:id/giveaways to list all giveaways
 
 ## Public
 - [X] GET /public/commands to get all bot's commands
 - [X] GET /public/giveaways to list all active giveaways
 
 ## User 
-- [ ] GET /giveaways to get joined giveaway
+- [X] GET /user get user
+- [X] GET /user/guilds get guilds
+- [ ] GET /user/giveaways get giveaways

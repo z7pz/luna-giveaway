@@ -66,7 +66,7 @@ impl GiveawayOptions {
         timer: Duration,
         entry_type: Option<EntryType>,
     ) -> Self {
-        let guild_entity = GuildEntity::new(guild_id);
+        let guild_entity = GuildEntity::new(&guild_id);
         let guild = guild_entity
             .find_or_create()
             .await

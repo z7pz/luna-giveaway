@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use axum::{
     async_trait,
     extract::{FromRequestParts, Request, State},
@@ -59,6 +61,14 @@ async fn get_discord_user(access_token: &String) -> Result<DiscordUser, reqwest:
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Guilds(pub Vec<GuildInfo>);
+
+impl Deref for Guilds {
+    type Target = Vec<GuildInfo>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}   
 
 #[async_trait]
 impl FromRequestParts<AppState> for Guilds {

@@ -22,6 +22,9 @@ impl GiveawayEntity {
     pub fn new() -> Self {
         Self::default()
     }
+    pub async fn find_by_id(&self, id: &MessageId) -> Result<Option<giveaway::Data>, Error> {
+        Ok(self.prisma.giveaway().find_unique(giveaway::UniqueWhereParam::MessageIdEquals(id.clone().into())).exec().await?)
+    }
     pub async fn find_not_ended(&self) -> Result<Vec<giveaway::Data>, Error> {
         Ok(self.prisma.giveaway().find_many(vec![giveaway::is_ended::equals(false)]).exec().await?)
     }

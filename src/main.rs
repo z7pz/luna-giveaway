@@ -88,7 +88,7 @@ async fn main() {
                     Box::pin(async move {
                         println!("test");
                         if let Some(id) = ctx.guild_id {
-                            if let Ok(guild) = GuildEntity::new(id).find_or_create().await {
+                            if let Ok(guild) = GuildEntity::new(&id).find_or_create().await {
                                 Ok(Some(guild.prefix))
                             } else {
                                 Ok(None)
@@ -109,7 +109,7 @@ async fn main() {
                     println!("Checking command: {:?}", ctx.command().name);
 
                     if let Some(id) = ctx.guild_id() {
-                        let entity = GuildEntity::new(id);
+                        let entity = GuildEntity::new(&id);
                         let guild = entity.find_or_create().await?;
                         if guild.disabled_commands.contains(&ctx.command().name) {
                             return Ok(false);
