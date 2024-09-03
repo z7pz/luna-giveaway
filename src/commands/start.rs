@@ -18,7 +18,7 @@ pub enum EntryType {
 }
 
 /// Create a giveaway command with prize, winners, and timer as arguments
-#[poise::command(slash_command, prefix_command)]
+#[poise::command(slash_command, prefix_command, category = "Giveaway")]
 pub async fn start(
     ctx: Context<'_>,
     #[description = "Choose a prize"] prize: String,

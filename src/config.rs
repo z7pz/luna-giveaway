@@ -17,12 +17,15 @@ config! {
     
 	// discord
     DEFAULT_PREFIX String = "!"
-    DISCORD_SECRET String = ""
+    DISCORD_SECRET String = "QrJXaz7wZhzs9HFm0ZiP8ohVP9rr-N3N"
     DISCORD_TOKEN String = "MTI0ODAyNDk4MzMwNTk4MTk2Mg.GMyrcS.zaWcvrrLizzWZ5nBdDUJtJNluRRa0EDpLRB_-U"
-    DISCORD_ID String = ""
+    DISCORD_ID String = "1248024983305981962"
     REDIRECT_URI String = "http://localhost:3000/discord/redirect"
     GRANT_TYPE String = "authorization_code"
+    SCOPES String = "identify,guilds"
     
 	// encryption
 	SECRET String = "super-secret"
+
+    FRONTEND_URI String = "http://localhost:3000"
 }

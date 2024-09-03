@@ -7,16 +7,15 @@
 - [X] custom roles that have access to the commands
 - [X] custom start embed and end embed
 - [X] custom end message
-- [ ] reaction
+- [X] reaction
 
 
 ## Stage 2
-- [ ] Create API
-- [ ] Discord auth
+- [X] Create API
+- [X] Discord auth
 	- /login
 	- /redirect?code
 	- user
-	- guilds
 
 ## Stage 3
 - [ ] pause/resume commands
@@ -43,13 +42,13 @@
 
 # Routes
 ### Server only
-- [ ] GET /:id/settings to get all server's settings
-- [ ] POST /:id/settings to set settings to the server
-- [ ] GET /:id/giveaways to list all giveaways
+- [ ] GET /server/:id/settings to get all server's settings
+- [ ] POST /server/:id/settings to set settings to the server
+- [ ] GET /server/:id/giveaways to list all giveaways
 
 ## Public
-- [ ] GET /commands to get all bot's commands
-- [ ] GET /giveaways/all to list all giveaways
+- [X] GET /public/commands to get all bot's commands
+- [X] GET /public/giveaways to list all active giveaways
 
 ## User 
-- [ ] GET /giveaways/me to get joined giveaway
+- [ ] GET /giveaways to get joined giveaway

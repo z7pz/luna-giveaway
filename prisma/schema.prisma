@@ -67,5 +67,26 @@ model Giveaway {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  guild Guild @relation(fields: [guild_id], references: [id])
+  guild   Guild  @relation(fields: [guild_id], references: [id])
+  entries User[]
+}
+
+model User {
+  id BigInt @id
+
+  giveaways Giveaway[]
+
+  oauth Oauth? @relation()
+}
+
+model Oauth {
+  id            String @id @default(uuid())
+  access_token  String
+  refresh_token String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  
+  user       User     @relation(fields: [user_id], references: [id])
+  user_id BigInt @unique
 }

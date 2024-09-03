@@ -1,19 +1,10 @@
-use std::{
-    collections::HashMap,
-    sync::Arc,
-    time::{Duration, SystemTime, UNIX_EPOCH},
-};
+use std::sync::Arc;
 
-use crate::{entities::*, get_prisma, prelude::*};
-use chrono::{DateTime, Duration as ChronoDuration, Utc};
+use crate::{entities::*, prelude::*};
 use dashmap::DashMap;
-use futures::{lock::Mutex, FutureExt};
-use once_cell::sync::OnceCell;
-use poise::serenity_prelude::{
-    CacheHttp, ChannelId, CreateEmbed, CreateMessage, GuildId, Http, MessageId, UserId,
-};
-use serenity::{EditMessage, Message};
-use tokio::{sync::mpsc::Sender, time::sleep};
+use futures::lock::Mutex;
+use poise::serenity_prelude::{Http, MessageId};
+use tokio::sync::mpsc::Sender;
 
 use super::{
     giveaway::Giveaway,
@@ -26,7 +17,7 @@ pub struct GiveawayManager {
     pub tx: Sender<Arc<Mutex<Giveaway>>>,
     pub giveaways: Arc<DashMap<MessageId, Arc<Mutex<Giveaway>>>>,
     pub tasks: Arc<DashMap<MessageId, GiveawayTask>>,
-    entity: Arc<GiveawayEntity>,
+    pub entity: Arc<GiveawayEntity>,
 }
 impl GiveawayManager {
     pub async fn new(tx: Sender<Arc<Mutex<Giveaway>>>) -> Self {
@@ -42,7 +33,6 @@ impl GiveawayManager {
     }
 
     pub async fn create(&self, ctx: &Context<'_>, options: GiveawayOptions) -> Result<(), Error> {
-
         // sending giveaway start message
         let message = options
             .send_message(
@@ -96,11 +86,8 @@ impl GiveawayManager {
             } else {
                 let giveaway = Arc::new(Mutex::new(giveaway));
                 let message_id = giveaway.lock().await.message_id;
-                let task = self
-                    .create_task(message_id.clone(), giveaway.clone())
-                    .await;
-                self.giveaways
-                    .insert(message_id.clone(), giveaway.clone());
+                let task = self.create_task(message_id.clone(), giveaway.clone()).await;
+                self.giveaways.insert(message_id.clone(), giveaway.clone());
                 self.tasks.insert(message_id, task);
             }
         }

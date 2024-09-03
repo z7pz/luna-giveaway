@@ -1,34 +1,31 @@
 #[macro_use]
 extern crate lazy_static;
-use axum::{
-    response::{IntoResponse, Response},
-    routing::get,
-    Router,
-};
+use axum::Router;
 use config::{DEFAULT_PREFIX, DISCORD_TOKEN, PORT};
 use entities::*;
 use giveaway::manager::GiveawayManager;
 use once_cell::sync::OnceCell;
 use prisma_client::db::{EntryType, PrismaClient};
 use tokio::{net::TcpListener, sync::mpsc};
-
 use poise::{
     serenity_prelude::{
         self as serenity, CreateInteractionResponse, CreateInteractionResponseMessage,
     },
     PrefixFrameworkOptions,
 };
+use prelude::*;
 use std::{ops::Deref, time::Duration};
 use tokio::time::sleep;
 
-mod routes;
 mod commands;
 mod config;
 mod entities;
+mod error;
 mod giveaway;
-
+mod middlewares;
 mod prelude;
-use prelude::*;
+mod routes;
+mod structures;
 
 pub static PRISMA: OnceCell<PrismaClient> = OnceCell::new();
 
@@ -53,29 +50,39 @@ async fn help(
 
 #[tokio::main]
 async fn main() {
+    let commands = vec![
+        commands::end(),
+        commands::start(),
+        commands::reroll(),
+        help(),
+    ];
+
     let prisma = PrismaClient::_builder()
         .build()
         .await
         .expect("Failed to create Prisma client");
-    println!("Prisma client creating...");
 
     PRISMA.set(prisma).expect("Failed to set Prisma client");
 
-    println!("Prisma client created");
     let intents = serenity::GatewayIntents::all();
     let (tx, mut rx) = mpsc::channel(100);
     let manager = GiveawayManager::new(tx).await;
 
-    let data = Data { manager };
+    let data = Data {
+        manager,
+        prisma: get_prisma(),
+        commands: commands
+            .iter()
+            .filter(|f| f.category == Some("Giveaway".to_owned()))
+            .map(|f| f.name.clone())
+            .collect(),
+    };
     let router_data = data.clone();
+
+    // region: Setup framework
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
-            commands: vec![
-                commands::end(),
-                commands::start(),
-                commands::reroll(),
-                help(),
-            ],
+            commands,
             prefix_options: PrefixFrameworkOptions {
                 dynamic_prefix: Some(|ctx| {
                     Box::pin(async move {
@@ -156,13 +163,15 @@ async fn main() {
             })
         })
         .build();
+    // endregion: setup framework
 
+
+    // region: setup serenity client
     let client = serenity::ClientBuilder::new(&*DISCORD_TOKEN, intents)
         .framework(framework)
         .await;
 
     let mut client = client.unwrap();
-
     let manager = client.shard_manager.clone();
     tokio::spawn(async move {
         loop {
@@ -178,9 +187,8 @@ async fn main() {
             }
         }
     });
+    // endregion: setup serenity client
 
-    // Start two shards. Note that there is an ~5 second ratelimit period between when one shard
-    // can start after another.
     let cache_http = client.http.clone();
     let manager_job = tokio::spawn(async move {
         while let Some(giveaway) = rx.recv().await {
@@ -189,13 +197,17 @@ async fn main() {
             let _ = giveaway.lock().await.end(cache_http).await;
         }
     });
-    
-     let app = routes::mount(Router::new(), router_data.clone())
+
+    let app_state = AppState {
+        data: router_data,
+        cache: client.cache.clone(),
+    };
+    // region: Router
+    let app = routes::mount(Router::new(), app_state.clone())
         // .layer(layer)
-        .with_state(router_data);
-    
+        .with_state(app_state);
     // let app = Router::new().route("/", get(|| async { "Hello, World!" }));
-    
+
     tokio::spawn(async move {
         axum::serve(
             TcpListener::bind(format!("127.0.0.1:{}", *PORT))
@@ -206,6 +218,8 @@ async fn main() {
         .await
         .unwrap();
     });
+    // endregion: router
+
     let client_job = tokio::spawn(async move {
         if let Err(why) = client.start().await {
             println!("Client error: {why:?}");
@@ -216,6 +230,7 @@ async fn main() {
     manager_job.await.unwrap();
 }
 
+// region: Event handler
 async fn event_handler(
     ctx: &serenity::Context,
     event: &serenity::FullEvent,
@@ -299,4 +314,4 @@ async fn event_handler(
     }
     Ok(())
 }
-
+// endregion: event handler
