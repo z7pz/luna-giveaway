@@ -15,11 +15,11 @@ pub struct Giveaway {
     pub is_ended: bool,
 }
 impl Giveaway {
-    pub async  fn from_data(giveaway: giveaway::Data) -> Self {
+    pub async fn from_data(giveaway: giveaway::Data) -> Self {
         let delta = giveaway.end_at.timestamp() - Local::now().fixed_offset().timestamp();
         Self {
             entity: GiveawayEntity::new(),
-            message_id: MessageId::new(giveaway.message_id as u64) ,
+            message_id: MessageId::new(giveaway.message_id as u64),
             options: GiveawayOptions::from_data(giveaway).await,
             entries: vec![],
             is_ended: delta < 5,
@@ -37,7 +37,7 @@ impl Giveaway {
             is_ended: false,
         }
     }
-    pub async fn save(&self) -> Result<giveaway::Data, Error> {
+    pub async fn save(&self) -> Result<giveaway::Data> {
         self.entity.create(self).await
     }
     pub async fn add_entry(
@@ -53,9 +53,15 @@ impl Giveaway {
             return Err("You have already entered the giveaway".into());
         }
 
+        let (gid, uid) = (self.message_id.clone(), user_id.clone());
         self.entries.push(user_id);
-        
-        println!("Added entry: {}", user_id);
+        tokio::spawn(async move {
+            let user_entity = UserEntity::new(uid);
+            user_entity
+                .join_giveaway(&gid)
+                .await
+                .expect("Couldn't join the giveaway (DB)...");
+        });
         self.update_message(
             cache_http,
             StartMessage::edit_message(&self.options, &self.entries),
@@ -75,17 +81,35 @@ impl Giveaway {
     }
     pub async fn end(&mut self, cache_http: impl CacheHttp) -> Result<Message, Error> {
         self.is_ended = true;
+        let winners = self.get_winners();
+        println!("{:?}", winners);
         // TODO send a new message with the winners
+        let thread_winners = winners.clone();
+        let thread_id = self.message_id.clone();
+        tokio::spawn(async move {
+            let entity = GiveawayEntity::new();
+            entity
+                .set_winners(
+                    &thread_id,
+                    thread_winners
+                        .iter()
+                        .map(|&c| c.clone().into())
+                        .collect::<Vec<_>>(),
+                )
+                .await
+                .expect("Couldn't set winners (DB)...");
+        });
         self.entity.end(&self.message_id).await?;
         self.update_message(
             cache_http,
-            EndMessage::edit_message(&self.options, &self.entries, self.get_winners()),
+            EndMessage::edit_message(&self.options, &self.entries, &winners),
         )
         .await
     }
-    pub fn get_winners(&self) -> Vec<&UserId> {
+    pub fn get_winners(&self) -> Vec<UserId> {
         self.entries
-            .choose_multiple(&mut rand::thread_rng(), self.options.winners as usize)
-            .collect::<Vec<&UserId>>()
+            .choose_multiple(&mut rand::thread_rng(), self.options.winners_count as usize)
+            .cloned()
+            .collect::<Vec<UserId>>()
     }
 }

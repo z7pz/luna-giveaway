@@ -2,7 +2,7 @@ use serenity::MessageId;
 
 use crate::prelude::*;
 
-/// Create a giveaway command with prize, winners, and timer as arguments
+/// End a giveaway
 #[poise::command(slash_command, prefix_command, category = "Giveaway")]
 pub async fn end(
     ctx: Context<'_>,

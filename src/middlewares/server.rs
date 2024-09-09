@@ -10,7 +10,7 @@ use prisma_client::db::{self, oauth, user};
 use serde::{Deserialize, Serialize};
 use serenity::{GuildId, MessageId};
 
-use crate::prelude::*;
+use crate::{prelude::*, GuildEntity};
 use crate::structures::session::Session;
 use super::auth::Guilds;
 
@@ -40,16 +40,18 @@ pub async fn server(
     next: Next,
 ) -> Result<impl IntoResponse> {
     let user_guild = guilds.iter().cloned().find(|guild| guild.id == id);      
-
+    
     if user_guild.is_none() || !state.cache.guilds().contains(&id){
         return Err(Error::GuildNotFound)
     }
-
+    
     let guild = user_guild.unwrap();
-
+    
     if !guild.permissions.administrator() {
         return Err(Error::AccessDenied)
     }
+
+    GuildEntity::new(&id).find_or_create().await?;
 
     req.extensions_mut().insert(Guild(guild));
     

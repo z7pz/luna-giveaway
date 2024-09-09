@@ -8,19 +8,16 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use poise::serenity_prelude::{self, GuildInfo, Http};
-use prisma_client::db::{
-    self,
-    oauth,
-    user,
-};
+use prisma_client::db::{self, oauth, user};
 use serde::{Deserialize, Serialize};
+use serenity::UserId;
 
 use crate::prelude::*;
 use crate::structures::session::Session;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct DiscordUser {
-    pub id: String,
+    pub id: UserId,
     pub username: String,
     pub discriminator: String,
     pub global_name: Option<String>,
@@ -68,11 +65,11 @@ impl Deref for Guilds {
     fn deref(&self) -> &Self::Target {
         &self.0
     }
-}   
+}
 
 #[async_trait]
 impl FromRequestParts<AppState> for Guilds {
-    type Rejection = Response;
+    type Rejection = Error;
 
     async fn from_request_parts(
         parts: &mut Parts,
@@ -90,7 +87,7 @@ impl FromRequestParts<AppState> for Guilds {
                         .collect::<_>(),
                 )
             })
-            .map_err(|e| (StatusCode::UNAUTHORIZED, e.to_string()).into_response())?)
+            .map_err(|_| (Error::Unauthorized))?)
     }
 }
 
@@ -105,7 +102,7 @@ pub async fn get_discord_guilds(
 async fn verify_user(
     session: Session,
     AppState { data: state, .. }: &AppState,
-) -> Result<(DiscordUser, db::user::Data, db::oauth::Data), Response> {
+) -> Result<(DiscordUser, db::user::Data, db::oauth::Data)> {
     // TODO  caching
     let oauth = state
         .prisma
@@ -115,17 +112,19 @@ async fn verify_user(
         .await
         .ok()
         .and_then(|res| res)
-        .ok_or_else(|| (StatusCode::UNAUTHORIZED, "Unauthorized").into_response())?;
+        .ok_or_else(|| Error::Unauthorized)?;
 
     let discord = get_discord_user(&oauth.access_token)
         .await
         .ok()
-        .ok_or_else(|| (StatusCode::UNAUTHORIZED, "Unauthorized").into_response())?;
+        .ok_or_else(|| Error::Unauthorized)?;
 
     let profile = match state
         .prisma
         .user()
         .find_first(vec![user::id::equals(oauth.user_id)])
+        .with(user::giveaways::fetch(vec![]))
+        .with(user::winnings::fetch(vec![]))
         .exec()
         .await
         .ok()
@@ -142,13 +141,13 @@ pub async fn auth(
     State(state): State<AppState>,
     mut req: Request,
     next: Next,
-) -> Result<impl IntoResponse, Response> {
+) -> Result<impl IntoResponse> {
     let session = req
         .headers()
         .get("Authorization")
         .and_then(|h| h.to_str().ok())
         .and_then(|h| Session::decode(h.to_string()).ok())
-        .ok_or_else(|| (StatusCode::UNAUTHORIZED, "Unauthorized").into_response())?;
+        .ok_or_else(|| Error::Unauthorized)?;
     let (user, profile, oauth) = verify_user(session, &state).await?;
 
     req.extensions_mut().insert(user);

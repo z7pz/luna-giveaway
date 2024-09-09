@@ -2,15 +2,17 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use cron::error;
 use poise::serenity_prelude::{self, ReactionConversionError};
 use prisma_client_rust;
 use serde::Serialize;
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
-    #[error("Giveaway error: {0}")]
+    #[error("{0}")]
     Giveaway(String),
+
+    #[error("Unauthorized")]
+    Unauthorized,
     
     #[error("Access denied")]
     AccessDenied,
@@ -56,6 +58,7 @@ impl IntoResponse for Error {
     fn into_response(self) -> Response {
         let (status, error_message) = match self {
             Error::Jwt(err) => (StatusCode::UNAUTHORIZED, err.to_string()),
+            Error::Unauthorized => (StatusCode::UNAUTHORIZED, "Unauthorized".to_string()),
             Error::AccessDenied => (
                 StatusCode::FORBIDDEN,
                 "You don't have permission to access this guild".to_string(),

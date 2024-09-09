@@ -6,7 +6,7 @@ use crate::{
 use axum::{
     extract::{Query, State},
     http::StatusCode,
-    response::IntoResponse,
+    response::{IntoResponse, Redirect},
     routing::*,
     Json, Router,
 };
@@ -135,12 +135,8 @@ async fn redirect(
     let mut url = Url::parse(&*FRONTEND_URI).expect("Invalid base URL");
 
     url.set_query(Some(&format!("token={}", token)));
-    println!("{token:?}");
-    let stoken = Session::decode(token.to_string());
-    println!("{stoken:?}");
 
-    Ok(Json(token).into_response())
-    // Ok(Redirect::permanent(&url.to_string()).into_response())
+    Ok(Redirect::permanent(&url.to_string()).into_response())
 }
 
 pub fn routes() -> Router<AppState> {

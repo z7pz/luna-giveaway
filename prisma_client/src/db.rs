@@ -3938,58 +3938,62 @@ pub mod giveaway {
             }
         }
     }
-    pub mod winners {
+    pub mod winners_count {
         use super::super::*;
         use super::_prisma::*;
         use super::{
             OrderByParam, SetParam, UncheckedSetParam, UniqueWhereParam, WhereParam, WithParam,
         };
-        pub const NAME: &str = "winners";
+        pub const NAME: &str = "winners_count";
         pub struct Set(pub i32);
         impl From<Set> for SetParam {
             fn from(Set(v): Set) -> Self {
-                Self::SetWinners(v)
+                Self::SetWinnersCount(v)
             }
         }
         impl From<Set> for UncheckedSetParam {
             fn from(Set(v): Set) -> Self {
-                Self::Winners(v)
+                Self::WinnersCount(v)
             }
         }
         pub fn set<T: From<Set>>(value: i32) -> T {
             Set(value).into()
         }
         pub fn order(direction: ::prisma_client_rust::Direction) -> OrderByParam {
-            OrderByParam::Winners(direction)
+            OrderByParam::WinnersCount(direction)
         }
         pub fn equals(value: i32) -> WhereParam {
-            WhereParam::Winners(_prisma::read_filters::IntFilter::Equals(value))
+            WhereParam::WinnersCount(_prisma::read_filters::IntFilter::Equals(value))
         }
-        ::prisma_client_rust::scalar_where_param_fns!(_prisma::read_filters::IntFilter, Winners, {
-            fn in_vec(_: Vec<i32>) -> InVec;
-            fn not_in_vec(_: Vec<i32>) -> NotInVec;
-            fn lt(_: i32) -> Lt;
-            fn lte(_: i32) -> Lte;
-            fn gt(_: i32) -> Gt;
-            fn gte(_: i32) -> Gte;
-            fn not(_: i32) -> Not;
-        });
+        ::prisma_client_rust::scalar_where_param_fns!(
+            _prisma::read_filters::IntFilter,
+            WinnersCount,
+            {
+                fn in_vec(_: Vec<i32>) -> InVec;
+                fn not_in_vec(_: Vec<i32>) -> NotInVec;
+                fn lt(_: i32) -> Lt;
+                fn lte(_: i32) -> Lte;
+                fn gt(_: i32) -> Gt;
+                fn gte(_: i32) -> Gte;
+                fn not(_: i32) -> Not;
+            }
+        );
         pub fn increment(value: i32) -> SetParam {
-            SetParam::IncrementWinners(value)
+            SetParam::IncrementWinnersCount(value)
         }
         pub fn decrement(value: i32) -> SetParam {
-            SetParam::DecrementWinners(value)
+            SetParam::DecrementWinnersCount(value)
         }
         pub fn multiply(value: i32) -> SetParam {
-            SetParam::MultiplyWinners(value)
+            SetParam::MultiplyWinnersCount(value)
         }
         pub fn divide(value: i32) -> SetParam {
-            SetParam::DivideWinners(value)
+            SetParam::DivideWinnersCount(value)
         }
         pub struct Include;
         impl Into<super::IncludeParam> for Include {
             fn into(self) -> super::IncludeParam {
-                super::IncludeParam::Winners(self)
+                super::IncludeParam::WinnersCount(self)
             }
         }
         impl Include {
@@ -4000,7 +4004,7 @@ pub mod giveaway {
         pub struct Select;
         impl Into<super::SelectParam> for Select {
             fn into(self) -> super::SelectParam {
-                super::SelectParam::Winners(self)
+                super::SelectParam::WinnersCount(self)
             }
         }
         impl Select {
@@ -4525,6 +4529,148 @@ pub mod giveaway {
             }
         }
     }
+    pub mod winners {
+        use super::super::*;
+        use super::_prisma::*;
+        use super::{
+            OrderByParam, SetParam, UncheckedSetParam, UniqueWhereParam, WhereParam, WithParam,
+        };
+        pub const NAME: &str = "winners";
+        pub struct Fetch(pub user::ManyArgs);
+        impl Fetch {
+            pub fn with(mut self, params: impl Into<user::WithParam>) -> Self {
+                self.0 = self.0.with(params.into());
+                self
+            }
+            pub fn order_by(mut self, param: user::OrderByParam) -> Self {
+                self.0 = self.0.order_by(param);
+                self
+            }
+            pub fn skip(mut self, value: i64) -> Self {
+                self.0 = self.0.skip(value);
+                self
+            }
+            pub fn take(mut self, value: i64) -> Self {
+                self.0 = self.0.take(value);
+                self
+            }
+            pub fn cursor(mut self, value: user::UniqueWhereParam) -> Self {
+                self.0 = self.0.cursor(value.into());
+                self
+            }
+        }
+        impl From<Fetch> for WithParam {
+            fn from(Fetch(v): Fetch) -> Self {
+                WithParam::Winners(v)
+            }
+        }
+        pub fn fetch(params: Vec<user::WhereParam>) -> Fetch {
+            Fetch(user::ManyArgs::new(params))
+        }
+        pub struct Connect(pub Vec<user::UniqueWhereParam>);
+        impl From<Connect> for SetParam {
+            fn from(Connect(v): Connect) -> Self {
+                Self::ConnectWinners(v)
+            }
+        }
+        pub fn connect<T: From<Connect>>(params: Vec<user::UniqueWhereParam>) -> T {
+            Connect(params).into()
+        }
+        pub fn disconnect(params: Vec<user::UniqueWhereParam>) -> SetParam {
+            SetParam::DisconnectWinners(params)
+        }
+        pub fn set(params: Vec<user::UniqueWhereParam>) -> SetParam {
+            SetParam::SetWinners(params)
+        }
+        pub fn some(value: Vec<user::WhereParam>) -> WhereParam {
+            WhereParam::WinnersSome(value)
+        }
+        pub fn every(value: Vec<user::WhereParam>) -> WhereParam {
+            WhereParam::WinnersEvery(value)
+        }
+        pub fn none(value: Vec<user::WhereParam>) -> WhereParam {
+            WhereParam::WinnersNone(value)
+        }
+        pub enum Include {
+            Select(user::ManyArgs, Vec<user::SelectParam>),
+            Include(user::ManyArgs, Vec<user::IncludeParam>),
+            Fetch(user::ManyArgs),
+        }
+        impl Into<super::IncludeParam> for Include {
+            fn into(self) -> super::IncludeParam {
+                super::IncludeParam::Winners(self)
+            }
+        }
+        impl Include {
+            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
+                let (args, selections) = match self {
+                    Self::Select(args, selections) => (
+                        args.to_graphql().0,
+                        selections.into_iter().map(|s| s.to_selection()).collect(),
+                    ),
+                    Self::Include(args, selections) => (args.to_graphql().0, {
+                        let mut nested_selections =
+                            <user::Types as ::prisma_client_rust::ModelTypes>::scalar_selections();
+                        nested_selections.extend(selections.into_iter().map(|s| s.to_selection()));
+                        nested_selections
+                    }),
+                    Self::Fetch(args) => (
+                        args.to_graphql().0,
+                        <user::Types as ::prisma_client_rust::ModelTypes>::scalar_selections(),
+                    ),
+                };
+                ::prisma_client_rust::Selection::new(NAME, None, args, selections)
+            }
+            pub fn select(args: user::ManyArgs, nested_selections: Vec<user::SelectParam>) -> Self {
+                Self::Select(args, nested_selections)
+            }
+            pub fn include(
+                args: user::ManyArgs,
+                nested_selections: Vec<user::IncludeParam>,
+            ) -> Self {
+                Self::Include(args, nested_selections)
+            }
+        }
+        pub enum Select {
+            Select(user::ManyArgs, Vec<user::SelectParam>),
+            Include(user::ManyArgs, Vec<user::IncludeParam>),
+            Fetch(user::ManyArgs),
+        }
+        impl Into<super::SelectParam> for Select {
+            fn into(self) -> super::SelectParam {
+                super::SelectParam::Winners(self)
+            }
+        }
+        impl Select {
+            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
+                let (args, selections) = match self {
+                    Self::Select(args, selections) => (
+                        args.to_graphql().0,
+                        selections.into_iter().map(|s| s.to_selection()).collect(),
+                    ),
+                    Self::Include(args, selections) => (args.to_graphql().0, {
+                        let mut nested_selections = vec![];
+                        nested_selections.extend(selections.into_iter().map(|s| s.to_selection()));
+                        nested_selections
+                    }),
+                    Self::Fetch(args) => (
+                        args.to_graphql().0,
+                        <user::Types as ::prisma_client_rust::ModelTypes>::scalar_selections(),
+                    ),
+                };
+                ::prisma_client_rust::Selection::new(NAME, None, args, selections)
+            }
+            pub fn select(args: user::ManyArgs, nested_selections: Vec<user::SelectParam>) -> Self {
+                Self::Select(args, nested_selections)
+            }
+            pub fn include(
+                args: user::ManyArgs,
+                nested_selections: Vec<user::IncludeParam>,
+            ) -> Self {
+                Self::Include(args, nested_selections)
+            }
+        }
+    }
     pub fn create(
         message_id: i64,
         channel_id: i64,
@@ -4532,7 +4678,7 @@ pub mod giveaway {
         host: String,
         start_at: ::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>,
         end_at: ::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>,
-        winners: i32,
+        winners_count: i32,
         guild: super::guild::UniqueWhereParam,
         _params: Vec<SetParam>,
     ) -> (
@@ -4547,7 +4693,15 @@ pub mod giveaway {
         Vec<SetParam>,
     ) {
         (
-            message_id, channel_id, prize, host, start_at, end_at, winners, guild, _params,
+            message_id,
+            channel_id,
+            prize,
+            host,
+            start_at,
+            end_at,
+            winners_count,
+            guild,
+            _params,
         )
     }
     pub fn create_unchecked(
@@ -4558,7 +4712,7 @@ pub mod giveaway {
         host: String,
         start_at: ::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>,
         end_at: ::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>,
-        winners: i32,
+        winners_count: i32,
         _params: Vec<SetParam>,
     ) -> (
         i64,
@@ -4572,11 +4726,19 @@ pub mod giveaway {
         Vec<SetParam>,
     ) {
         (
-            message_id, guild_id, channel_id, prize, host, start_at, end_at, winners, _params,
+            message_id,
+            guild_id,
+            channel_id,
+            prize,
+            host,
+            start_at,
+            end_at,
+            winners_count,
+            _params,
         )
     }
     #[macro_export]
-    macro_rules ! _select_giveaway { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: giveaway :: select ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: giveaway :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn select ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: giveaway :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: giveaway :: select ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: giveaway :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: giveaway :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { message_id , guild_id , channel_id , prize , host , start_at , end_at , winners , is_ended , created_at , updated_at , guild , entries } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { $ (pub $ field : crate :: prisma :: giveaway :: select ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) +] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: giveaway :: $ field :: NAME , & self . $ field) ? ;) * state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: giveaway :: $ field :: NAME) , + ,] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: giveaway :: $ field :: NAME => Ok (Field :: $ field)) , * , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * while let Some (key) = map . next_key () ? { match key { $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: $ field :: NAME)) ? ;) * Ok (Data { $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["message_id" , "guild_id" , "channel_id" , "prize" , "host" , "start_at" , "end_at" , "winners" , "is_ended" , "created_at" , "updated_at" , "guild" , "entries"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: giveaway :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; message_id) => { i64 } ; (@ field_type ; guild_id) => { i64 } ; (@ field_type ; channel_id) => { i64 } ; (@ field_type ; prize) => { String } ; (@ field_type ; host) => { String } ; (@ field_type ; start_at) => { :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } ; (@ field_type ; end_at) => { :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } ; (@ field_type ; winners) => { i32 } ; (@ field_type ; is_ended) => { bool } ; (@ field_type ; created_at) => { :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } ; (@ field_type ; updated_at) => { :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } ; (@ field_type ; guild : $ selection_mode : ident { $ ($ selections : tt) + }) => { guild :: Data } ; (@ field_type ; guild) => { crate :: prisma :: guild :: Data } ; (@ field_type ; entries : $ selection_mode : ident { $ ($ selections : tt) + }) => { Vec < entries :: Data > } ; (@ field_type ; entries) => { Vec < crate :: prisma :: user :: Data > } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Giveaway" , available relations are "message_id, guild_id, channel_id, prize, host, start_at, end_at, winners, is_ended, created_at, updated_at, guild, entries")) } ; (@ field_module ; guild : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: guild :: select ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; entries : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: user :: select ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; message_id) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: message_id :: Select) } ; (@ selection_field_to_selection_param ; guild_id) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: guild_id :: Select) } ; (@ selection_field_to_selection_param ; channel_id) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: channel_id :: Select) } ; (@ selection_field_to_selection_param ; prize) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: prize :: Select) } ; (@ selection_field_to_selection_param ; host) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: host :: Select) } ; (@ selection_field_to_selection_param ; start_at) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: start_at :: Select) } ; (@ selection_field_to_selection_param ; end_at) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: end_at :: Select) } ; (@ selection_field_to_selection_param ; winners) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: winners :: Select) } ; (@ selection_field_to_selection_param ; is_ended) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: is_ended :: Select) } ; (@ selection_field_to_selection_param ; created_at) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: created_at :: Select) } ; (@ selection_field_to_selection_param ; updated_at) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: updated_at :: Select) } ; (@ selection_field_to_selection_param ; guild $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: guild :: Select :: $ selection_mode (crate :: prisma :: guild :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; guild $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: guild :: Select :: Fetch) } } ; (@ selection_field_to_selection_param ; entries $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: entries :: Select :: $ selection_mode (crate :: prisma :: user :: ManyArgs :: new (crate :: prisma :: user :: select ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ? , crate :: prisma :: user :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; entries $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: entries :: Select :: Fetch (crate :: prisma :: user :: ManyArgs :: new (crate :: prisma :: user :: select ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ?) ,) } } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: giveaway :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; message_id) => { "message_id" } ; (@ field_serde_name ; guild_id) => { "guild_id" } ; (@ field_serde_name ; channel_id) => { "channel_id" } ; (@ field_serde_name ; prize) => { "prize" } ; (@ field_serde_name ; host) => { "host" } ; (@ field_serde_name ; start_at) => { "start_at" } ; (@ field_serde_name ; end_at) => { "end_at" } ; (@ field_serde_name ; winners) => { "winners" } ; (@ field_serde_name ; is_ended) => { "is_ended" } ; (@ field_serde_name ; created_at) => { "created_at" } ; (@ field_serde_name ; updated_at) => { "updated_at" } ; (@ field_serde_name ; guild) => { "guild" } ; (@ field_serde_name ; entries) => { "entries" } ; }
+    macro_rules ! _select_giveaway { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: giveaway :: select ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: giveaway :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn select ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: giveaway :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: giveaway :: select ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: giveaway :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: giveaway :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { message_id , guild_id , channel_id , prize , host , start_at , end_at , winners_count , is_ended , created_at , updated_at , guild , entries , winners } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { $ (pub $ field : crate :: prisma :: giveaway :: select ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) +] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: giveaway :: $ field :: NAME , & self . $ field) ? ;) * state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: giveaway :: $ field :: NAME) , + ,] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: giveaway :: $ field :: NAME => Ok (Field :: $ field)) , * , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * while let Some (key) = map . next_key () ? { match key { $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: $ field :: NAME)) ? ;) * Ok (Data { $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["message_id" , "guild_id" , "channel_id" , "prize" , "host" , "start_at" , "end_at" , "winners_count" , "is_ended" , "created_at" , "updated_at" , "guild" , "entries" , "winners"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: giveaway :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; message_id) => { i64 } ; (@ field_type ; guild_id) => { i64 } ; (@ field_type ; channel_id) => { i64 } ; (@ field_type ; prize) => { String } ; (@ field_type ; host) => { String } ; (@ field_type ; start_at) => { :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } ; (@ field_type ; end_at) => { :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } ; (@ field_type ; winners_count) => { i32 } ; (@ field_type ; is_ended) => { bool } ; (@ field_type ; created_at) => { :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } ; (@ field_type ; updated_at) => { :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } ; (@ field_type ; guild : $ selection_mode : ident { $ ($ selections : tt) + }) => { guild :: Data } ; (@ field_type ; guild) => { crate :: prisma :: guild :: Data } ; (@ field_type ; entries : $ selection_mode : ident { $ ($ selections : tt) + }) => { Vec < entries :: Data > } ; (@ field_type ; entries) => { Vec < crate :: prisma :: user :: Data > } ; (@ field_type ; winners : $ selection_mode : ident { $ ($ selections : tt) + }) => { Vec < winners :: Data > } ; (@ field_type ; winners) => { Vec < crate :: prisma :: user :: Data > } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Giveaway" , available relations are "message_id, guild_id, channel_id, prize, host, start_at, end_at, winners_count, is_ended, created_at, updated_at, guild, entries, winners")) } ; (@ field_module ; guild : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: guild :: select ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; entries : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: user :: select ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; winners : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: user :: select ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; message_id) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: message_id :: Select) } ; (@ selection_field_to_selection_param ; guild_id) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: guild_id :: Select) } ; (@ selection_field_to_selection_param ; channel_id) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: channel_id :: Select) } ; (@ selection_field_to_selection_param ; prize) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: prize :: Select) } ; (@ selection_field_to_selection_param ; host) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: host :: Select) } ; (@ selection_field_to_selection_param ; start_at) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: start_at :: Select) } ; (@ selection_field_to_selection_param ; end_at) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: end_at :: Select) } ; (@ selection_field_to_selection_param ; winners_count) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: winners_count :: Select) } ; (@ selection_field_to_selection_param ; is_ended) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: is_ended :: Select) } ; (@ selection_field_to_selection_param ; created_at) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: created_at :: Select) } ; (@ selection_field_to_selection_param ; updated_at) => { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: updated_at :: Select) } ; (@ selection_field_to_selection_param ; guild $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: guild :: Select :: $ selection_mode (crate :: prisma :: guild :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; guild $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: guild :: Select :: Fetch) } } ; (@ selection_field_to_selection_param ; entries $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: entries :: Select :: $ selection_mode (crate :: prisma :: user :: ManyArgs :: new (crate :: prisma :: user :: select ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ? , crate :: prisma :: user :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; entries $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: entries :: Select :: Fetch (crate :: prisma :: user :: ManyArgs :: new (crate :: prisma :: user :: select ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ?) ,) } } ; (@ selection_field_to_selection_param ; winners $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: winners :: Select :: $ selection_mode (crate :: prisma :: user :: ManyArgs :: new (crate :: prisma :: user :: select ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ? , crate :: prisma :: user :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; winners $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: giveaway :: SelectParam > :: into (crate :: prisma :: giveaway :: winners :: Select :: Fetch (crate :: prisma :: user :: ManyArgs :: new (crate :: prisma :: user :: select ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ?) ,) } } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: giveaway :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; message_id) => { "message_id" } ; (@ field_serde_name ; guild_id) => { "guild_id" } ; (@ field_serde_name ; channel_id) => { "channel_id" } ; (@ field_serde_name ; prize) => { "prize" } ; (@ field_serde_name ; host) => { "host" } ; (@ field_serde_name ; start_at) => { "start_at" } ; (@ field_serde_name ; end_at) => { "end_at" } ; (@ field_serde_name ; winners_count) => { "winners_count" } ; (@ field_serde_name ; is_ended) => { "is_ended" } ; (@ field_serde_name ; created_at) => { "created_at" } ; (@ field_serde_name ; updated_at) => { "updated_at" } ; (@ field_serde_name ; guild) => { "guild" } ; (@ field_serde_name ; entries) => { "entries" } ; (@ field_serde_name ; winners) => { "winners" } ; }
     pub use _select_giveaway as select;
     pub enum SelectParam {
         MessageId(message_id::Select),
@@ -4586,12 +4748,13 @@ pub mod giveaway {
         Host(host::Select),
         StartAt(start_at::Select),
         EndAt(end_at::Select),
-        Winners(winners::Select),
+        WinnersCount(winners_count::Select),
         IsEnded(is_ended::Select),
         CreatedAt(created_at::Select),
         UpdatedAt(updated_at::Select),
         Guild(guild::Select),
         Entries(entries::Select),
+        Winners(winners::Select),
     }
     impl SelectParam {
         pub fn to_selection(self) -> ::prisma_client_rust::Selection {
@@ -4603,17 +4766,18 @@ pub mod giveaway {
                 Self::Host(data) => data.to_selection(),
                 Self::StartAt(data) => data.to_selection(),
                 Self::EndAt(data) => data.to_selection(),
-                Self::Winners(data) => data.to_selection(),
+                Self::WinnersCount(data) => data.to_selection(),
                 Self::IsEnded(data) => data.to_selection(),
                 Self::CreatedAt(data) => data.to_selection(),
                 Self::UpdatedAt(data) => data.to_selection(),
                 Self::Guild(data) => data.to_selection(),
                 Self::Entries(data) => data.to_selection(),
+                Self::Winners(data) => data.to_selection(),
             }
         }
     }
     #[macro_export]
-    macro_rules ! _include_giveaway { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: giveaway :: include ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: giveaway :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn include ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: giveaway :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: giveaway :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: giveaway :: include ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: giveaway :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: giveaway :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: giveaway :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { guild , entries } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { pub message_id : i64 , pub guild_id : i64 , pub channel_id : i64 , pub prize : String , pub host : String , pub start_at : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , pub end_at : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , pub winners : i32 , pub is_ended : bool , pub created_at : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , pub updated_at : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , $ (pub $ field : crate :: prisma :: giveaway :: include ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) + stringify ! (message_id) , stringify ! (guild_id) , stringify ! (channel_id) , stringify ! (prize) , stringify ! (host) , stringify ! (start_at) , stringify ! (end_at) , stringify ! (winners) , stringify ! (is_ended) , stringify ! (created_at) , stringify ! (updated_at)] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: giveaway :: $ field :: NAME , & self . $ field) ? ;) * state . serialize_field (crate :: prisma :: giveaway :: message_id :: NAME , & self . message_id) ? ; state . serialize_field (crate :: prisma :: giveaway :: guild_id :: NAME , & self . guild_id) ? ; state . serialize_field (crate :: prisma :: giveaway :: channel_id :: NAME , & self . channel_id) ? ; state . serialize_field (crate :: prisma :: giveaway :: prize :: NAME , & self . prize) ? ; state . serialize_field (crate :: prisma :: giveaway :: host :: NAME , & self . host) ? ; state . serialize_field (crate :: prisma :: giveaway :: start_at :: NAME , & self . start_at) ? ; state . serialize_field (crate :: prisma :: giveaway :: end_at :: NAME , & self . end_at) ? ; state . serialize_field (crate :: prisma :: giveaway :: winners :: NAME , & self . winners) ? ; state . serialize_field (crate :: prisma :: giveaway :: is_ended :: NAME , & self . is_ended) ? ; state . serialize_field (crate :: prisma :: giveaway :: created_at :: NAME , & self . created_at) ? ; state . serialize_field (crate :: prisma :: giveaway :: updated_at :: NAME , & self . updated_at) ? ; state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , message_id , guild_id , channel_id , prize , host , start_at , end_at , winners , is_ended , created_at , updated_at } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: giveaway :: $ field :: NAME) , + , crate :: prisma :: giveaway :: message_id :: NAME , crate :: prisma :: giveaway :: guild_id :: NAME , crate :: prisma :: giveaway :: channel_id :: NAME , crate :: prisma :: giveaway :: prize :: NAME , crate :: prisma :: giveaway :: host :: NAME , crate :: prisma :: giveaway :: start_at :: NAME , crate :: prisma :: giveaway :: end_at :: NAME , crate :: prisma :: giveaway :: winners :: NAME , crate :: prisma :: giveaway :: is_ended :: NAME , crate :: prisma :: giveaway :: created_at :: NAME , crate :: prisma :: giveaway :: updated_at :: NAME] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: giveaway :: $ field :: NAME => Ok (Field :: $ field)) , * , crate :: prisma :: giveaway :: message_id :: NAME => Ok (Field :: message_id) , crate :: prisma :: giveaway :: guild_id :: NAME => Ok (Field :: guild_id) , crate :: prisma :: giveaway :: channel_id :: NAME => Ok (Field :: channel_id) , crate :: prisma :: giveaway :: prize :: NAME => Ok (Field :: prize) , crate :: prisma :: giveaway :: host :: NAME => Ok (Field :: host) , crate :: prisma :: giveaway :: start_at :: NAME => Ok (Field :: start_at) , crate :: prisma :: giveaway :: end_at :: NAME => Ok (Field :: end_at) , crate :: prisma :: giveaway :: winners :: NAME => Ok (Field :: winners) , crate :: prisma :: giveaway :: is_ended :: NAME => Ok (Field :: is_ended) , crate :: prisma :: giveaway :: created_at :: NAME => Ok (Field :: created_at) , crate :: prisma :: giveaway :: updated_at :: NAME => Ok (Field :: updated_at) , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * let mut message_id = None ; let mut guild_id = None ; let mut channel_id = None ; let mut prize = None ; let mut host = None ; let mut start_at = None ; let mut end_at = None ; let mut winners = None ; let mut is_ended = None ; let mut created_at = None ; let mut updated_at = None ; while let Some (key) = map . next_key () ? { match key { Field :: message_id => { if message_id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: message_id :: NAME)) ; } message_id = Some (map . next_value () ?) ; } Field :: guild_id => { if guild_id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: guild_id :: NAME)) ; } guild_id = Some (map . next_value () ?) ; } Field :: channel_id => { if channel_id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: channel_id :: NAME)) ; } channel_id = Some (map . next_value () ?) ; } Field :: prize => { if prize . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: prize :: NAME)) ; } prize = Some (map . next_value () ?) ; } Field :: host => { if host . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: host :: NAME)) ; } host = Some (map . next_value () ?) ; } Field :: start_at => { if start_at . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: start_at :: NAME)) ; } start_at = Some (map . next_value () ?) ; } Field :: end_at => { if end_at . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: end_at :: NAME)) ; } end_at = Some (map . next_value () ?) ; } Field :: winners => { if winners . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: winners :: NAME)) ; } winners = Some (map . next_value () ?) ; } Field :: is_ended => { if is_ended . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: is_ended :: NAME)) ; } is_ended = Some (map . next_value () ?) ; } Field :: created_at => { if created_at . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: created_at :: NAME)) ; } created_at = Some (map . next_value () ?) ; } Field :: updated_at => { if updated_at . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: updated_at :: NAME)) ; } updated_at = Some (map . next_value () ?) ; } $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: $ field :: NAME)) ? ;) * let message_id = message_id . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: message_id :: NAME)) ? ; let guild_id = guild_id . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: guild_id :: NAME)) ? ; let channel_id = channel_id . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: channel_id :: NAME)) ? ; let prize = prize . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: prize :: NAME)) ? ; let host = host . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: host :: NAME)) ? ; let start_at = start_at . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: start_at :: NAME)) ? ; let end_at = end_at . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: end_at :: NAME)) ? ; let winners = winners . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: winners :: NAME)) ? ; let is_ended = is_ended . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: is_ended :: NAME)) ? ; let created_at = created_at . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: created_at :: NAME)) ? ; let updated_at = updated_at . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: updated_at :: NAME)) ? ; Ok (Data { message_id , guild_id , channel_id , prize , host , start_at , end_at , winners , is_ended , created_at , updated_at , $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["message_id" , "guild_id" , "channel_id" , "prize" , "host" , "start_at" , "end_at" , "winners" , "is_ended" , "created_at" , "updated_at" , "guild" , "entries"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: giveaway :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; guild : $ selection_mode : ident { $ ($ selections : tt) + }) => { guild :: Data } ; (@ field_type ; guild) => { crate :: prisma :: guild :: Data } ; (@ field_type ; entries : $ selection_mode : ident { $ ($ selections : tt) + }) => { Vec < entries :: Data > } ; (@ field_type ; entries) => { Vec < crate :: prisma :: user :: Data > } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Giveaway" , available relations are "guild, entries")) } ; (@ field_module ; guild : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: guild :: include ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; entries : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: user :: include ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; guild $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: giveaway :: IncludeParam > :: into (crate :: prisma :: giveaway :: guild :: Include :: $ selection_mode (crate :: prisma :: guild :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; guild $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: giveaway :: IncludeParam > :: into (crate :: prisma :: giveaway :: guild :: Include :: Fetch) } } ; (@ selection_field_to_selection_param ; entries $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: giveaway :: IncludeParam > :: into (crate :: prisma :: giveaway :: entries :: Include :: $ selection_mode (crate :: prisma :: user :: ManyArgs :: new (crate :: prisma :: user :: include ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ? , crate :: prisma :: user :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; entries $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: giveaway :: IncludeParam > :: into (crate :: prisma :: giveaway :: entries :: Include :: Fetch (crate :: prisma :: user :: ManyArgs :: new (crate :: prisma :: user :: include ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ?) ,) } } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: giveaway :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; message_id) => { "message_id" } ; (@ field_serde_name ; guild_id) => { "guild_id" } ; (@ field_serde_name ; channel_id) => { "channel_id" } ; (@ field_serde_name ; prize) => { "prize" } ; (@ field_serde_name ; host) => { "host" } ; (@ field_serde_name ; start_at) => { "start_at" } ; (@ field_serde_name ; end_at) => { "end_at" } ; (@ field_serde_name ; winners) => { "winners" } ; (@ field_serde_name ; is_ended) => { "is_ended" } ; (@ field_serde_name ; created_at) => { "created_at" } ; (@ field_serde_name ; updated_at) => { "updated_at" } ; (@ field_serde_name ; guild) => { "guild" } ; (@ field_serde_name ; entries) => { "entries" } ; }
+    macro_rules ! _include_giveaway { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: giveaway :: include ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: giveaway :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn include ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: giveaway :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: giveaway :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: giveaway :: include ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: giveaway :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: giveaway :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: giveaway :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { guild , entries , winners } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { pub message_id : i64 , pub guild_id : i64 , pub channel_id : i64 , pub prize : String , pub host : String , pub start_at : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , pub end_at : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , pub winners_count : i32 , pub is_ended : bool , pub created_at : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , pub updated_at : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , $ (pub $ field : crate :: prisma :: giveaway :: include ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) + stringify ! (message_id) , stringify ! (guild_id) , stringify ! (channel_id) , stringify ! (prize) , stringify ! (host) , stringify ! (start_at) , stringify ! (end_at) , stringify ! (winners_count) , stringify ! (is_ended) , stringify ! (created_at) , stringify ! (updated_at)] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: giveaway :: $ field :: NAME , & self . $ field) ? ;) * state . serialize_field (crate :: prisma :: giveaway :: message_id :: NAME , & self . message_id) ? ; state . serialize_field (crate :: prisma :: giveaway :: guild_id :: NAME , & self . guild_id) ? ; state . serialize_field (crate :: prisma :: giveaway :: channel_id :: NAME , & self . channel_id) ? ; state . serialize_field (crate :: prisma :: giveaway :: prize :: NAME , & self . prize) ? ; state . serialize_field (crate :: prisma :: giveaway :: host :: NAME , & self . host) ? ; state . serialize_field (crate :: prisma :: giveaway :: start_at :: NAME , & self . start_at) ? ; state . serialize_field (crate :: prisma :: giveaway :: end_at :: NAME , & self . end_at) ? ; state . serialize_field (crate :: prisma :: giveaway :: winners_count :: NAME , & self . winners_count) ? ; state . serialize_field (crate :: prisma :: giveaway :: is_ended :: NAME , & self . is_ended) ? ; state . serialize_field (crate :: prisma :: giveaway :: created_at :: NAME , & self . created_at) ? ; state . serialize_field (crate :: prisma :: giveaway :: updated_at :: NAME , & self . updated_at) ? ; state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , message_id , guild_id , channel_id , prize , host , start_at , end_at , winners_count , is_ended , created_at , updated_at } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: giveaway :: $ field :: NAME) , + , crate :: prisma :: giveaway :: message_id :: NAME , crate :: prisma :: giveaway :: guild_id :: NAME , crate :: prisma :: giveaway :: channel_id :: NAME , crate :: prisma :: giveaway :: prize :: NAME , crate :: prisma :: giveaway :: host :: NAME , crate :: prisma :: giveaway :: start_at :: NAME , crate :: prisma :: giveaway :: end_at :: NAME , crate :: prisma :: giveaway :: winners_count :: NAME , crate :: prisma :: giveaway :: is_ended :: NAME , crate :: prisma :: giveaway :: created_at :: NAME , crate :: prisma :: giveaway :: updated_at :: NAME] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: giveaway :: $ field :: NAME => Ok (Field :: $ field)) , * , crate :: prisma :: giveaway :: message_id :: NAME => Ok (Field :: message_id) , crate :: prisma :: giveaway :: guild_id :: NAME => Ok (Field :: guild_id) , crate :: prisma :: giveaway :: channel_id :: NAME => Ok (Field :: channel_id) , crate :: prisma :: giveaway :: prize :: NAME => Ok (Field :: prize) , crate :: prisma :: giveaway :: host :: NAME => Ok (Field :: host) , crate :: prisma :: giveaway :: start_at :: NAME => Ok (Field :: start_at) , crate :: prisma :: giveaway :: end_at :: NAME => Ok (Field :: end_at) , crate :: prisma :: giveaway :: winners_count :: NAME => Ok (Field :: winners_count) , crate :: prisma :: giveaway :: is_ended :: NAME => Ok (Field :: is_ended) , crate :: prisma :: giveaway :: created_at :: NAME => Ok (Field :: created_at) , crate :: prisma :: giveaway :: updated_at :: NAME => Ok (Field :: updated_at) , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * let mut message_id = None ; let mut guild_id = None ; let mut channel_id = None ; let mut prize = None ; let mut host = None ; let mut start_at = None ; let mut end_at = None ; let mut winners_count = None ; let mut is_ended = None ; let mut created_at = None ; let mut updated_at = None ; while let Some (key) = map . next_key () ? { match key { Field :: message_id => { if message_id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: message_id :: NAME)) ; } message_id = Some (map . next_value () ?) ; } Field :: guild_id => { if guild_id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: guild_id :: NAME)) ; } guild_id = Some (map . next_value () ?) ; } Field :: channel_id => { if channel_id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: channel_id :: NAME)) ; } channel_id = Some (map . next_value () ?) ; } Field :: prize => { if prize . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: prize :: NAME)) ; } prize = Some (map . next_value () ?) ; } Field :: host => { if host . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: host :: NAME)) ; } host = Some (map . next_value () ?) ; } Field :: start_at => { if start_at . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: start_at :: NAME)) ; } start_at = Some (map . next_value () ?) ; } Field :: end_at => { if end_at . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: end_at :: NAME)) ; } end_at = Some (map . next_value () ?) ; } Field :: winners_count => { if winners_count . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: winners_count :: NAME)) ; } winners_count = Some (map . next_value () ?) ; } Field :: is_ended => { if is_ended . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: is_ended :: NAME)) ; } is_ended = Some (map . next_value () ?) ; } Field :: created_at => { if created_at . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: created_at :: NAME)) ; } created_at = Some (map . next_value () ?) ; } Field :: updated_at => { if updated_at . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: updated_at :: NAME)) ; } updated_at = Some (map . next_value () ?) ; } $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: giveaway :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: $ field :: NAME)) ? ;) * let message_id = message_id . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: message_id :: NAME)) ? ; let guild_id = guild_id . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: guild_id :: NAME)) ? ; let channel_id = channel_id . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: channel_id :: NAME)) ? ; let prize = prize . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: prize :: NAME)) ? ; let host = host . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: host :: NAME)) ? ; let start_at = start_at . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: start_at :: NAME)) ? ; let end_at = end_at . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: end_at :: NAME)) ? ; let winners_count = winners_count . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: winners_count :: NAME)) ? ; let is_ended = is_ended . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: is_ended :: NAME)) ? ; let created_at = created_at . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: created_at :: NAME)) ? ; let updated_at = updated_at . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: giveaway :: updated_at :: NAME)) ? ; Ok (Data { message_id , guild_id , channel_id , prize , host , start_at , end_at , winners_count , is_ended , created_at , updated_at , $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["message_id" , "guild_id" , "channel_id" , "prize" , "host" , "start_at" , "end_at" , "winners_count" , "is_ended" , "created_at" , "updated_at" , "guild" , "entries" , "winners"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: giveaway :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; guild : $ selection_mode : ident { $ ($ selections : tt) + }) => { guild :: Data } ; (@ field_type ; guild) => { crate :: prisma :: guild :: Data } ; (@ field_type ; entries : $ selection_mode : ident { $ ($ selections : tt) + }) => { Vec < entries :: Data > } ; (@ field_type ; entries) => { Vec < crate :: prisma :: user :: Data > } ; (@ field_type ; winners : $ selection_mode : ident { $ ($ selections : tt) + }) => { Vec < winners :: Data > } ; (@ field_type ; winners) => { Vec < crate :: prisma :: user :: Data > } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Giveaway" , available relations are "guild, entries, winners")) } ; (@ field_module ; guild : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: guild :: include ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; entries : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: user :: include ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; winners : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: user :: include ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; guild $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: giveaway :: IncludeParam > :: into (crate :: prisma :: giveaway :: guild :: Include :: $ selection_mode (crate :: prisma :: guild :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; guild $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: giveaway :: IncludeParam > :: into (crate :: prisma :: giveaway :: guild :: Include :: Fetch) } } ; (@ selection_field_to_selection_param ; entries $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: giveaway :: IncludeParam > :: into (crate :: prisma :: giveaway :: entries :: Include :: $ selection_mode (crate :: prisma :: user :: ManyArgs :: new (crate :: prisma :: user :: include ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ? , crate :: prisma :: user :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; entries $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: giveaway :: IncludeParam > :: into (crate :: prisma :: giveaway :: entries :: Include :: Fetch (crate :: prisma :: user :: ManyArgs :: new (crate :: prisma :: user :: include ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ?) ,) } } ; (@ selection_field_to_selection_param ; winners $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: giveaway :: IncludeParam > :: into (crate :: prisma :: giveaway :: winners :: Include :: $ selection_mode (crate :: prisma :: user :: ManyArgs :: new (crate :: prisma :: user :: include ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ? , crate :: prisma :: user :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; winners $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: giveaway :: IncludeParam > :: into (crate :: prisma :: giveaway :: winners :: Include :: Fetch (crate :: prisma :: user :: ManyArgs :: new (crate :: prisma :: user :: include ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ?) ,) } } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: giveaway :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; message_id) => { "message_id" } ; (@ field_serde_name ; guild_id) => { "guild_id" } ; (@ field_serde_name ; channel_id) => { "channel_id" } ; (@ field_serde_name ; prize) => { "prize" } ; (@ field_serde_name ; host) => { "host" } ; (@ field_serde_name ; start_at) => { "start_at" } ; (@ field_serde_name ; end_at) => { "end_at" } ; (@ field_serde_name ; winners_count) => { "winners_count" } ; (@ field_serde_name ; is_ended) => { "is_ended" } ; (@ field_serde_name ; created_at) => { "created_at" } ; (@ field_serde_name ; updated_at) => { "updated_at" } ; (@ field_serde_name ; guild) => { "guild" } ; (@ field_serde_name ; entries) => { "entries" } ; (@ field_serde_name ; winners) => { "winners" } ; }
     pub use _include_giveaway as include;
     pub enum IncludeParam {
         MessageId(message_id::Include),
@@ -4623,12 +4787,13 @@ pub mod giveaway {
         Host(host::Include),
         StartAt(start_at::Include),
         EndAt(end_at::Include),
-        Winners(winners::Include),
+        WinnersCount(winners_count::Include),
         IsEnded(is_ended::Include),
         CreatedAt(created_at::Include),
         UpdatedAt(updated_at::Include),
         Guild(guild::Include),
         Entries(entries::Include),
+        Winners(winners::Include),
     }
     impl IncludeParam {
         pub fn to_selection(self) -> ::prisma_client_rust::Selection {
@@ -4640,17 +4805,18 @@ pub mod giveaway {
                 Self::Host(data) => data.to_selection(),
                 Self::StartAt(data) => data.to_selection(),
                 Self::EndAt(data) => data.to_selection(),
-                Self::Winners(data) => data.to_selection(),
+                Self::WinnersCount(data) => data.to_selection(),
                 Self::IsEnded(data) => data.to_selection(),
                 Self::CreatedAt(data) => data.to_selection(),
                 Self::UpdatedAt(data) => data.to_selection(),
                 Self::Guild(data) => data.to_selection(),
                 Self::Entries(data) => data.to_selection(),
+                Self::Winners(data) => data.to_selection(),
             }
         }
     }
     #[macro_export]
-    macro_rules ! _partial_unchecked_giveaway { ($ struct_name : ident { $ ($ scalar_field : ident) + }) => { :: prisma_client_rust :: macros :: partial_unchecked ! { crate :: prisma :: giveaway struct $ struct_name { # [serde (rename = "message_id")] pub message_id : i64 , # [serde (rename = "guild_id")] pub guild_id : i64 , # [serde (rename = "channel_id")] pub channel_id : i64 , # [serde (rename = "prize")] pub prize : String , # [serde (rename = "host")] pub host : String , # [serde (rename = "start_at")] pub start_at : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , # [serde (rename = "end_at")] pub end_at : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , # [serde (rename = "winners")] pub winners : i32 , # [serde (rename = "is_ended")] pub is_ended : bool , # [serde (rename = "created_at")] pub created_at : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , # [serde (rename = "updated_at")] pub updated_at : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } [$ ($ scalar_field) , +] } } ; }
+    macro_rules ! _partial_unchecked_giveaway { ($ struct_name : ident { $ ($ scalar_field : ident) + }) => { :: prisma_client_rust :: macros :: partial_unchecked ! { crate :: prisma :: giveaway struct $ struct_name { # [serde (rename = "message_id")] pub message_id : i64 , # [serde (rename = "guild_id")] pub guild_id : i64 , # [serde (rename = "channel_id")] pub channel_id : i64 , # [serde (rename = "prize")] pub prize : String , # [serde (rename = "host")] pub host : String , # [serde (rename = "start_at")] pub start_at : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , # [serde (rename = "end_at")] pub end_at : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , # [serde (rename = "winners_count")] pub winners_count : i32 , # [serde (rename = "is_ended")] pub is_ended : bool , # [serde (rename = "created_at")] pub created_at : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , # [serde (rename = "updated_at")] pub updated_at : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } [$ ($ scalar_field) , +] } } ; }
     pub use _partial_unchecked_giveaway as partial_unchecked;
     #[derive(Debug, Clone, :: serde :: Serialize, :: serde :: Deserialize)]
     pub struct Data {
@@ -4670,8 +4836,8 @@ pub mod giveaway {
         #[serde(rename = "end_at")]
         pub end_at:
             ::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>,
-        #[serde(rename = "winners")]
-        pub winners: i32,
+        #[serde(rename = "winners_count")]
+        pub winners_count: i32,
         #[serde(rename = "is_ended")]
         pub is_ended: bool,
         #[serde(rename = "created_at")]
@@ -4684,6 +4850,8 @@ pub mod giveaway {
         pub guild: Option<Box<super::guild::Data>>,
         #[serde(rename = "entries")]
         pub entries: Option<Vec<super::user::Data>>,
+        #[serde(rename = "winners")]
+        pub winners: Option<Vec<super::user::Data>>,
     }
     impl Data {
         pub fn guild(
@@ -4706,11 +4874,22 @@ pub mod giveaway {
                     stringify!(entries),
                 ))
         }
+        pub fn winners(
+            &self,
+        ) -> Result<&Vec<super::user::Data>, ::prisma_client_rust::RelationNotFetchedError>
+        {
+            self.winners
+                .as_ref()
+                .ok_or(::prisma_client_rust::RelationNotFetchedError::new(
+                    stringify!(winners),
+                ))
+        }
     }
     #[derive(Clone)]
     pub enum WithParam {
         Guild(super::guild::UniqueArgs),
         Entries(super::user::ManyArgs),
+        Winners(super::user::ManyArgs),
     }
     impl Into<::prisma_client_rust::Selection> for WithParam {
         fn into(self) -> ::prisma_client_rust::Selection {
@@ -4732,6 +4911,19 @@ pub mod giveaway {
                     );
                     ::prisma_client_rust::Selection::new(
                         entries::NAME,
+                        None,
+                        arguments,
+                        nested_selections,
+                    )
+                }
+                Self::Winners(args) => {
+                    let (arguments, mut nested_selections) = args.to_graphql();
+                    nested_selections.extend(
+                        <super::user::Types as ::prisma_client_rust::ModelTypes>::scalar_selections(
+                        ),
+                    );
+                    ::prisma_client_rust::Selection::new(
+                        winners::NAME,
                         None,
                         arguments,
                         nested_selections,
@@ -4763,11 +4955,11 @@ pub mod giveaway {
             ::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>,
         ),
         SetEndAt(::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>),
-        SetWinners(i32),
-        IncrementWinners(i32),
-        DecrementWinners(i32),
-        MultiplyWinners(i32),
-        DivideWinners(i32),
+        SetWinnersCount(i32),
+        IncrementWinnersCount(i32),
+        DecrementWinnersCount(i32),
+        MultiplyWinnersCount(i32),
+        DivideWinnersCount(i32),
         SetIsEnded(bool),
         SetCreatedAt(
             ::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>,
@@ -4779,6 +4971,9 @@ pub mod giveaway {
         ConnectEntries(Vec<super::user::UniqueWhereParam>),
         DisconnectEntries(Vec<super::user::UniqueWhereParam>),
         SetEntries(Vec<super::user::UniqueWhereParam>),
+        ConnectWinners(Vec<super::user::UniqueWhereParam>),
+        DisconnectWinners(Vec<super::user::UniqueWhereParam>),
+        SetWinners(Vec<super::user::UniqueWhereParam>),
     }
     impl From<SetParam> for (String, ::prisma_client_rust::PrismaValue) {
         fn from(param: SetParam) -> Self {
@@ -4895,33 +5090,33 @@ pub mod giveaway {
                     end_at::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::DateTime(value),
                 ),
-                SetParam::SetWinners(value) => (
-                    winners::NAME.to_string(),
+                SetParam::SetWinnersCount(value) => (
+                    winners_count::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::Int(value as i64),
                 ),
-                SetParam::IncrementWinners(value) => (
-                    winners::NAME.to_string(),
+                SetParam::IncrementWinnersCount(value) => (
+                    winners_count::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::Object(vec![(
                         "increment".to_string(),
                         ::prisma_client_rust::PrismaValue::Int(value as i64),
                     )]),
                 ),
-                SetParam::DecrementWinners(value) => (
-                    winners::NAME.to_string(),
+                SetParam::DecrementWinnersCount(value) => (
+                    winners_count::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::Object(vec![(
                         "decrement".to_string(),
                         ::prisma_client_rust::PrismaValue::Int(value as i64),
                     )]),
                 ),
-                SetParam::MultiplyWinners(value) => (
-                    winners::NAME.to_string(),
+                SetParam::MultiplyWinnersCount(value) => (
+                    winners_count::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::Object(vec![(
                         "multiply".to_string(),
                         ::prisma_client_rust::PrismaValue::Int(value as i64),
                     )]),
                 ),
-                SetParam::DivideWinners(value) => (
-                    winners::NAME.to_string(),
+                SetParam::DivideWinnersCount(value) => (
+                    winners_count::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::Object(vec![(
                         "divide".to_string(),
                         ::prisma_client_rust::PrismaValue::Int(value as i64),
@@ -4998,6 +5193,51 @@ pub mod giveaway {
                         ),
                     )]),
                 ),
+                SetParam::ConnectWinners(where_params) => (
+                    winners::NAME.to_string(),
+                    ::prisma_client_rust::PrismaValue::Object(vec![(
+                        "connect".to_string(),
+                        ::prisma_client_rust::PrismaValue::List(
+                            where_params
+                                .into_iter()
+                                .map(Into::<super::user::WhereParam>::into)
+                                .map(::prisma_client_rust::WhereInput::serialize)
+                                .map(::prisma_client_rust::SerializedWhereInput::transform_equals)
+                                .map(|v| ::prisma_client_rust::PrismaValue::Object(vec![v]))
+                                .collect(),
+                        ),
+                    )]),
+                ),
+                SetParam::DisconnectWinners(where_params) => (
+                    winners::NAME.to_string(),
+                    ::prisma_client_rust::PrismaValue::Object(vec![(
+                        "disconnect".to_string(),
+                        ::prisma_client_rust::PrismaValue::List(
+                            where_params
+                                .into_iter()
+                                .map(Into::<super::user::WhereParam>::into)
+                                .map(::prisma_client_rust::WhereInput::serialize)
+                                .map(::prisma_client_rust::SerializedWhereInput::transform_equals)
+                                .map(|v| ::prisma_client_rust::PrismaValue::Object(vec![v]))
+                                .collect(),
+                        ),
+                    )]),
+                ),
+                SetParam::SetWinners(where_params) => (
+                    winners::NAME.to_string(),
+                    ::prisma_client_rust::PrismaValue::Object(vec![(
+                        "set".to_string(),
+                        ::prisma_client_rust::PrismaValue::List(
+                            where_params
+                                .into_iter()
+                                .map(Into::<super::user::WhereParam>::into)
+                                .map(::prisma_client_rust::WhereInput::serialize)
+                                .map(::prisma_client_rust::SerializedWhereInput::transform_equals)
+                                .map(|v| ::prisma_client_rust::PrismaValue::Object(vec![v]))
+                                .collect(),
+                        ),
+                    )]),
+                ),
             }
         }
     }
@@ -5010,7 +5250,7 @@ pub mod giveaway {
         Host(String),
         StartAt(::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>),
         EndAt(::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>),
-        Winners(i32),
+        WinnersCount(i32),
         IsEnded(bool),
         CreatedAt(
             ::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>,
@@ -5029,7 +5269,7 @@ pub mod giveaway {
                 UncheckedSetParam::Host(value) => Self::SetHost(value),
                 UncheckedSetParam::StartAt(value) => Self::SetStartAt(value),
                 UncheckedSetParam::EndAt(value) => Self::SetEndAt(value),
-                UncheckedSetParam::Winners(value) => Self::SetWinners(value),
+                UncheckedSetParam::WinnersCount(value) => Self::SetWinnersCount(value),
                 UncheckedSetParam::IsEnded(value) => Self::SetIsEnded(value),
                 UncheckedSetParam::CreatedAt(value) => Self::SetCreatedAt(value),
                 UncheckedSetParam::UpdatedAt(value) => Self::SetUpdatedAt(value),
@@ -5045,7 +5285,7 @@ pub mod giveaway {
         Host(::prisma_client_rust::Direction),
         StartAt(::prisma_client_rust::Direction),
         EndAt(::prisma_client_rust::Direction),
-        Winners(::prisma_client_rust::Direction),
+        WinnersCount(::prisma_client_rust::Direction),
         IsEnded(::prisma_client_rust::Direction),
         CreatedAt(::prisma_client_rust::Direction),
         UpdatedAt(::prisma_client_rust::Direction),
@@ -5081,8 +5321,8 @@ pub mod giveaway {
                     end_at::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::String(direction.to_string()),
                 ),
-                Self::Winners(direction) => (
-                    winners::NAME.to_string(),
+                Self::WinnersCount(direction) => (
+                    winners_count::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::String(direction.to_string()),
                 ),
                 Self::IsEnded(direction) => (
@@ -5112,7 +5352,7 @@ pub mod giveaway {
         Host(_prisma::read_filters::StringFilter),
         StartAt(_prisma::read_filters::DateTimeFilter),
         EndAt(_prisma::read_filters::DateTimeFilter),
-        Winners(_prisma::read_filters::IntFilter),
+        WinnersCount(_prisma::read_filters::IntFilter),
         IsEnded(_prisma::read_filters::BoolFilter),
         CreatedAt(_prisma::read_filters::DateTimeFilter),
         UpdatedAt(_prisma::read_filters::DateTimeFilter),
@@ -5121,6 +5361,9 @@ pub mod giveaway {
         EntriesSome(Vec<super::user::WhereParam>),
         EntriesEvery(Vec<super::user::WhereParam>),
         EntriesNone(Vec<super::user::WhereParam>),
+        WinnersSome(Vec<super::user::WhereParam>),
+        WinnersEvery(Vec<super::user::WhereParam>),
+        WinnersNone(Vec<super::user::WhereParam>),
     }
     impl ::prisma_client_rust::WhereInput for WhereParam {
         fn serialize(self) -> ::prisma_client_rust::SerializedWhereInput {
@@ -5168,7 +5411,7 @@ pub mod giveaway {
                 Self::Host(value) => (host::NAME, value.into()),
                 Self::StartAt(value) => (start_at::NAME, value.into()),
                 Self::EndAt(value) => (end_at::NAME, value.into()),
-                Self::Winners(value) => (winners::NAME, value.into()),
+                Self::WinnersCount(value) => (winners_count::NAME, value.into()),
                 Self::IsEnded(value) => (is_ended::NAME, value.into()),
                 Self::CreatedAt(value) => (created_at::NAME, value.into()),
                 Self::UpdatedAt(value) => (updated_at::NAME, value.into()),
@@ -5237,6 +5480,45 @@ pub mod giveaway {
                         ),
                     )]),
                 ),
+                Self::WinnersSome(where_params) => (
+                    winners::NAME,
+                    ::prisma_client_rust::SerializedWhereValue::Object(vec![(
+                        "some".to_string(),
+                        ::prisma_client_rust::PrismaValue::Object(
+                            where_params
+                                .into_iter()
+                                .map(::prisma_client_rust::WhereInput::serialize)
+                                .map(::prisma_client_rust::SerializedWhereInput::transform_equals)
+                                .collect(),
+                        ),
+                    )]),
+                ),
+                Self::WinnersEvery(where_params) => (
+                    winners::NAME,
+                    ::prisma_client_rust::SerializedWhereValue::Object(vec![(
+                        "every".to_string(),
+                        ::prisma_client_rust::PrismaValue::Object(
+                            where_params
+                                .into_iter()
+                                .map(::prisma_client_rust::WhereInput::serialize)
+                                .map(::prisma_client_rust::SerializedWhereInput::transform_equals)
+                                .collect(),
+                        ),
+                    )]),
+                ),
+                Self::WinnersNone(where_params) => (
+                    winners::NAME,
+                    ::prisma_client_rust::SerializedWhereValue::Object(vec![(
+                        "none".to_string(),
+                        ::prisma_client_rust::PrismaValue::Object(
+                            where_params
+                                .into_iter()
+                                .map(::prisma_client_rust::WhereInput::serialize)
+                                .map(::prisma_client_rust::SerializedWhereInput::transform_equals)
+                                .collect(),
+                        ),
+                    )]),
+                ),
             };
             ::prisma_client_rust::SerializedWhereInput::new(name, value.into())
         }
@@ -5283,7 +5565,7 @@ pub mod giveaway {
                 ::prisma_client_rust::sel(host::NAME),
                 ::prisma_client_rust::sel(start_at::NAME),
                 ::prisma_client_rust::sel(end_at::NAME),
-                ::prisma_client_rust::sel(winners::NAME),
+                ::prisma_client_rust::sel(winners_count::NAME),
                 ::prisma_client_rust::sel(is_ended::NAME),
                 ::prisma_client_rust::sel(created_at::NAME),
                 ::prisma_client_rust::sel(updated_at::NAME),
@@ -5329,7 +5611,7 @@ pub mod giveaway {
             end_at: ::prisma_client_rust::chrono::DateTime<
                 ::prisma_client_rust::chrono::FixedOffset,
             >,
-            winners: i32,
+            winners_count: i32,
             guild: super::guild::UniqueWhereParam,
             mut _params: Vec<SetParam>,
         ) -> Create<'a> {
@@ -5340,7 +5622,7 @@ pub mod giveaway {
                 host::set(host),
                 start_at::set(start_at),
                 end_at::set(end_at),
-                winners::set(winners),
+                winners_count::set(winners_count),
                 guild::connect(guild),
             ]);
             Create::new(self.client, _params)
@@ -5358,7 +5640,7 @@ pub mod giveaway {
             end_at: ::prisma_client_rust::chrono::DateTime<
                 ::prisma_client_rust::chrono::FixedOffset,
             >,
-            winners: i32,
+            winners_count: i32,
             mut _params: Vec<UncheckedSetParam>,
         ) -> Create<'a> {
             _params.extend([
@@ -5369,7 +5651,7 @@ pub mod giveaway {
                 host::set(host),
                 start_at::set(start_at),
                 end_at::set(end_at),
-                winners::set(winners),
+                winners_count::set(winners_count),
             ]);
             Create::new(self.client, _params.into_iter().map(Into::into).collect())
         }
@@ -5398,7 +5680,7 @@ pub mod giveaway {
                         host,
                         start_at,
                         end_at,
-                        winners,
+                        winners_count,
                         mut _params,
                     )| {
                         _params.extend([
@@ -5409,7 +5691,7 @@ pub mod giveaway {
                             host::set(host),
                             start_at::set(start_at),
                             end_at::set(end_at),
-                            winners::set(winners),
+                            winners_count::set(winners_count),
                         ]);
                         _params
                     },
@@ -5442,7 +5724,17 @@ pub mod giveaway {
         pub fn upsert(
             self,
             _where: UniqueWhereParam,
-            (message_id, channel_id, prize, host, start_at, end_at, winners, guild, mut _params): (
+            (
+                message_id,
+                channel_id,
+                prize,
+                host,
+                start_at,
+                end_at,
+                winners_count,
+                guild,
+                mut _params,
+            ): (
                 i64,
                 i64,
                 String,
@@ -5462,7 +5754,7 @@ pub mod giveaway {
                 host::set(host),
                 start_at::set(start_at),
                 end_at::set(end_at),
-                winners::set(winners),
+                winners_count::set(winners_count),
                 guild::connect(guild),
             ]);
             Upsert::new(self.client, _where.into(), _params, _update)
@@ -5700,6 +5992,153 @@ pub mod user {
             }
         }
     }
+    pub mod winnings {
+        use super::super::*;
+        use super::_prisma::*;
+        use super::{
+            OrderByParam, SetParam, UncheckedSetParam, UniqueWhereParam, WhereParam, WithParam,
+        };
+        pub const NAME: &str = "winnings";
+        pub struct Fetch(pub giveaway::ManyArgs);
+        impl Fetch {
+            pub fn with(mut self, params: impl Into<giveaway::WithParam>) -> Self {
+                self.0 = self.0.with(params.into());
+                self
+            }
+            pub fn order_by(mut self, param: giveaway::OrderByParam) -> Self {
+                self.0 = self.0.order_by(param);
+                self
+            }
+            pub fn skip(mut self, value: i64) -> Self {
+                self.0 = self.0.skip(value);
+                self
+            }
+            pub fn take(mut self, value: i64) -> Self {
+                self.0 = self.0.take(value);
+                self
+            }
+            pub fn cursor(mut self, value: giveaway::UniqueWhereParam) -> Self {
+                self.0 = self.0.cursor(value.into());
+                self
+            }
+        }
+        impl From<Fetch> for WithParam {
+            fn from(Fetch(v): Fetch) -> Self {
+                WithParam::Winnings(v)
+            }
+        }
+        pub fn fetch(params: Vec<giveaway::WhereParam>) -> Fetch {
+            Fetch(giveaway::ManyArgs::new(params))
+        }
+        pub struct Connect(pub Vec<giveaway::UniqueWhereParam>);
+        impl From<Connect> for SetParam {
+            fn from(Connect(v): Connect) -> Self {
+                Self::ConnectWinnings(v)
+            }
+        }
+        pub fn connect<T: From<Connect>>(params: Vec<giveaway::UniqueWhereParam>) -> T {
+            Connect(params).into()
+        }
+        pub fn disconnect(params: Vec<giveaway::UniqueWhereParam>) -> SetParam {
+            SetParam::DisconnectWinnings(params)
+        }
+        pub fn set(params: Vec<giveaway::UniqueWhereParam>) -> SetParam {
+            SetParam::SetWinnings(params)
+        }
+        pub fn some(value: Vec<giveaway::WhereParam>) -> WhereParam {
+            WhereParam::WinningsSome(value)
+        }
+        pub fn every(value: Vec<giveaway::WhereParam>) -> WhereParam {
+            WhereParam::WinningsEvery(value)
+        }
+        pub fn none(value: Vec<giveaway::WhereParam>) -> WhereParam {
+            WhereParam::WinningsNone(value)
+        }
+        pub enum Include {
+            Select(giveaway::ManyArgs, Vec<giveaway::SelectParam>),
+            Include(giveaway::ManyArgs, Vec<giveaway::IncludeParam>),
+            Fetch(giveaway::ManyArgs),
+        }
+        impl Into<super::IncludeParam> for Include {
+            fn into(self) -> super::IncludeParam {
+                super::IncludeParam::Winnings(self)
+            }
+        }
+        impl Include {
+            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
+                let (args, selections) = match self {
+                    Self::Select(args, selections) => (
+                        args.to_graphql().0,
+                        selections.into_iter().map(|s| s.to_selection()).collect(),
+                    ),
+                    Self::Include(args, selections) => (args.to_graphql().0, {
+                        let mut nested_selections = < giveaway :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections () ;
+                        nested_selections.extend(selections.into_iter().map(|s| s.to_selection()));
+                        nested_selections
+                    }),
+                    Self::Fetch(args) => (
+                        args.to_graphql().0,
+                        <giveaway::Types as ::prisma_client_rust::ModelTypes>::scalar_selections(),
+                    ),
+                };
+                ::prisma_client_rust::Selection::new(NAME, None, args, selections)
+            }
+            pub fn select(
+                args: giveaway::ManyArgs,
+                nested_selections: Vec<giveaway::SelectParam>,
+            ) -> Self {
+                Self::Select(args, nested_selections)
+            }
+            pub fn include(
+                args: giveaway::ManyArgs,
+                nested_selections: Vec<giveaway::IncludeParam>,
+            ) -> Self {
+                Self::Include(args, nested_selections)
+            }
+        }
+        pub enum Select {
+            Select(giveaway::ManyArgs, Vec<giveaway::SelectParam>),
+            Include(giveaway::ManyArgs, Vec<giveaway::IncludeParam>),
+            Fetch(giveaway::ManyArgs),
+        }
+        impl Into<super::SelectParam> for Select {
+            fn into(self) -> super::SelectParam {
+                super::SelectParam::Winnings(self)
+            }
+        }
+        impl Select {
+            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
+                let (args, selections) = match self {
+                    Self::Select(args, selections) => (
+                        args.to_graphql().0,
+                        selections.into_iter().map(|s| s.to_selection()).collect(),
+                    ),
+                    Self::Include(args, selections) => (args.to_graphql().0, {
+                        let mut nested_selections = vec![];
+                        nested_selections.extend(selections.into_iter().map(|s| s.to_selection()));
+                        nested_selections
+                    }),
+                    Self::Fetch(args) => (
+                        args.to_graphql().0,
+                        <giveaway::Types as ::prisma_client_rust::ModelTypes>::scalar_selections(),
+                    ),
+                };
+                ::prisma_client_rust::Selection::new(NAME, None, args, selections)
+            }
+            pub fn select(
+                args: giveaway::ManyArgs,
+                nested_selections: Vec<giveaway::SelectParam>,
+            ) -> Self {
+                Self::Select(args, nested_selections)
+            }
+            pub fn include(
+                args: giveaway::ManyArgs,
+                nested_selections: Vec<giveaway::IncludeParam>,
+            ) -> Self {
+                Self::Include(args, nested_selections)
+            }
+        }
+    }
     pub mod oauth {
         use super::super::*;
         use super::_prisma::*;
@@ -5820,11 +6259,12 @@ pub mod user {
         (id, _params)
     }
     #[macro_export]
-    macro_rules ! _select_user { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: user :: select ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: user :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn select ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: user :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: user :: select ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: user :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: user :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { id , giveaways , oauth } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { $ (pub $ field : crate :: prisma :: user :: select ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) +] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: user :: $ field :: NAME , & self . $ field) ? ;) * state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: user :: $ field :: NAME) , + ,] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: user :: $ field :: NAME => Ok (Field :: $ field)) , * , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * while let Some (key) = map . next_key () ? { match key { $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: user :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: user :: $ field :: NAME)) ? ;) * Ok (Data { $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "giveaways" , "oauth"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: user :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; id) => { i64 } ; (@ field_type ; giveaways : $ selection_mode : ident { $ ($ selections : tt) + }) => { Vec < giveaways :: Data > } ; (@ field_type ; giveaways) => { Vec < crate :: prisma :: giveaway :: Data > } ; (@ field_type ; oauth : $ selection_mode : ident { $ ($ selections : tt) + }) => { Option < oauth :: Data > } ; (@ field_type ; oauth) => { Option < crate :: prisma :: oauth :: Data > } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "User" , available relations are "id, giveaways, oauth")) } ; (@ field_module ; giveaways : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: giveaway :: select ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; oauth : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: oauth :: select ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; id) => { Into :: < crate :: prisma :: user :: SelectParam > :: into (crate :: prisma :: user :: id :: Select) } ; (@ selection_field_to_selection_param ; giveaways $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: user :: SelectParam > :: into (crate :: prisma :: user :: giveaways :: Select :: $ selection_mode (crate :: prisma :: giveaway :: ManyArgs :: new (crate :: prisma :: giveaway :: select ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ? , crate :: prisma :: giveaway :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; giveaways $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: user :: SelectParam > :: into (crate :: prisma :: user :: giveaways :: Select :: Fetch (crate :: prisma :: giveaway :: ManyArgs :: new (crate :: prisma :: giveaway :: select ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ?) ,) } } ; (@ selection_field_to_selection_param ; oauth $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: user :: SelectParam > :: into (crate :: prisma :: user :: oauth :: Select :: $ selection_mode (crate :: prisma :: oauth :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; oauth $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: user :: SelectParam > :: into (crate :: prisma :: user :: oauth :: Select :: Fetch) } } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: user :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; giveaways) => { "giveaways" } ; (@ field_serde_name ; oauth) => { "oauth" } ; }
+    macro_rules ! _select_user { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: user :: select ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: user :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn select ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: user :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: user :: select ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: user :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: user :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { id , giveaways , winnings , oauth } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { $ (pub $ field : crate :: prisma :: user :: select ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) +] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: user :: $ field :: NAME , & self . $ field) ? ;) * state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: user :: $ field :: NAME) , + ,] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: user :: $ field :: NAME => Ok (Field :: $ field)) , * , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * while let Some (key) = map . next_key () ? { match key { $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: user :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: user :: $ field :: NAME)) ? ;) * Ok (Data { $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "giveaways" , "winnings" , "oauth"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: user :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; id) => { i64 } ; (@ field_type ; giveaways : $ selection_mode : ident { $ ($ selections : tt) + }) => { Vec < giveaways :: Data > } ; (@ field_type ; giveaways) => { Vec < crate :: prisma :: giveaway :: Data > } ; (@ field_type ; winnings : $ selection_mode : ident { $ ($ selections : tt) + }) => { Vec < winnings :: Data > } ; (@ field_type ; winnings) => { Vec < crate :: prisma :: giveaway :: Data > } ; (@ field_type ; oauth : $ selection_mode : ident { $ ($ selections : tt) + }) => { Option < oauth :: Data > } ; (@ field_type ; oauth) => { Option < crate :: prisma :: oauth :: Data > } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "User" , available relations are "id, giveaways, winnings, oauth")) } ; (@ field_module ; giveaways : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: giveaway :: select ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; winnings : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: giveaway :: select ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; oauth : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: oauth :: select ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; id) => { Into :: < crate :: prisma :: user :: SelectParam > :: into (crate :: prisma :: user :: id :: Select) } ; (@ selection_field_to_selection_param ; giveaways $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: user :: SelectParam > :: into (crate :: prisma :: user :: giveaways :: Select :: $ selection_mode (crate :: prisma :: giveaway :: ManyArgs :: new (crate :: prisma :: giveaway :: select ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ? , crate :: prisma :: giveaway :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; giveaways $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: user :: SelectParam > :: into (crate :: prisma :: user :: giveaways :: Select :: Fetch (crate :: prisma :: giveaway :: ManyArgs :: new (crate :: prisma :: giveaway :: select ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ?) ,) } } ; (@ selection_field_to_selection_param ; winnings $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: user :: SelectParam > :: into (crate :: prisma :: user :: winnings :: Select :: $ selection_mode (crate :: prisma :: giveaway :: ManyArgs :: new (crate :: prisma :: giveaway :: select ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ? , crate :: prisma :: giveaway :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; winnings $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: user :: SelectParam > :: into (crate :: prisma :: user :: winnings :: Select :: Fetch (crate :: prisma :: giveaway :: ManyArgs :: new (crate :: prisma :: giveaway :: select ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ?) ,) } } ; (@ selection_field_to_selection_param ; oauth $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: user :: SelectParam > :: into (crate :: prisma :: user :: oauth :: Select :: $ selection_mode (crate :: prisma :: oauth :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; oauth $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: user :: SelectParam > :: into (crate :: prisma :: user :: oauth :: Select :: Fetch) } } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: user :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; giveaways) => { "giveaways" } ; (@ field_serde_name ; winnings) => { "winnings" } ; (@ field_serde_name ; oauth) => { "oauth" } ; }
     pub use _select_user as select;
     pub enum SelectParam {
         Id(id::Select),
         Giveaways(giveaways::Select),
+        Winnings(winnings::Select),
         Oauth(oauth::Select),
     }
     impl SelectParam {
@@ -5832,16 +6272,18 @@ pub mod user {
             match self {
                 Self::Id(data) => data.to_selection(),
                 Self::Giveaways(data) => data.to_selection(),
+                Self::Winnings(data) => data.to_selection(),
                 Self::Oauth(data) => data.to_selection(),
             }
         }
     }
     #[macro_export]
-    macro_rules ! _include_user { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: user :: include ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: user :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn include ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: user :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: user :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: user :: include ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: user :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: user :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: user :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { giveaways , oauth } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { pub id : i64 , $ (pub $ field : crate :: prisma :: user :: include ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) + stringify ! (id)] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: user :: $ field :: NAME , & self . $ field) ? ;) * state . serialize_field (crate :: prisma :: user :: id :: NAME , & self . id) ? ; state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , id } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: user :: $ field :: NAME) , + , crate :: prisma :: user :: id :: NAME] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: user :: $ field :: NAME => Ok (Field :: $ field)) , * , crate :: prisma :: user :: id :: NAME => Ok (Field :: id) , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * let mut id = None ; while let Some (key) = map . next_key () ? { match key { Field :: id => { if id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: user :: id :: NAME)) ; } id = Some (map . next_value () ?) ; } $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: user :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: user :: $ field :: NAME)) ? ;) * let id = id . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: user :: id :: NAME)) ? ; Ok (Data { id , $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "giveaways" , "oauth"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: user :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; giveaways : $ selection_mode : ident { $ ($ selections : tt) + }) => { Vec < giveaways :: Data > } ; (@ field_type ; giveaways) => { Vec < crate :: prisma :: giveaway :: Data > } ; (@ field_type ; oauth : $ selection_mode : ident { $ ($ selections : tt) + }) => { Option < oauth :: Data > } ; (@ field_type ; oauth) => { Option < crate :: prisma :: oauth :: Data > } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "User" , available relations are "giveaways, oauth")) } ; (@ field_module ; giveaways : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: giveaway :: include ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; oauth : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: oauth :: include ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; giveaways $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: user :: IncludeParam > :: into (crate :: prisma :: user :: giveaways :: Include :: $ selection_mode (crate :: prisma :: giveaway :: ManyArgs :: new (crate :: prisma :: giveaway :: include ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ? , crate :: prisma :: giveaway :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; giveaways $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: user :: IncludeParam > :: into (crate :: prisma :: user :: giveaways :: Include :: Fetch (crate :: prisma :: giveaway :: ManyArgs :: new (crate :: prisma :: giveaway :: include ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ?) ,) } } ; (@ selection_field_to_selection_param ; oauth $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: user :: IncludeParam > :: into (crate :: prisma :: user :: oauth :: Include :: $ selection_mode (crate :: prisma :: oauth :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; oauth $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: user :: IncludeParam > :: into (crate :: prisma :: user :: oauth :: Include :: Fetch) } } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: user :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; giveaways) => { "giveaways" } ; (@ field_serde_name ; oauth) => { "oauth" } ; }
+    macro_rules ! _include_user { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: user :: include ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: user :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn include ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: user :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: user :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: user :: include ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: user :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: user :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: user :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { giveaways , winnings , oauth } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { pub id : i64 , $ (pub $ field : crate :: prisma :: user :: include ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) + stringify ! (id)] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: user :: $ field :: NAME , & self . $ field) ? ;) * state . serialize_field (crate :: prisma :: user :: id :: NAME , & self . id) ? ; state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , id } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: user :: $ field :: NAME) , + , crate :: prisma :: user :: id :: NAME] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: user :: $ field :: NAME => Ok (Field :: $ field)) , * , crate :: prisma :: user :: id :: NAME => Ok (Field :: id) , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * let mut id = None ; while let Some (key) = map . next_key () ? { match key { Field :: id => { if id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: user :: id :: NAME)) ; } id = Some (map . next_value () ?) ; } $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: user :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: user :: $ field :: NAME)) ? ;) * let id = id . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: user :: id :: NAME)) ? ; Ok (Data { id , $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "giveaways" , "winnings" , "oauth"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: user :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; giveaways : $ selection_mode : ident { $ ($ selections : tt) + }) => { Vec < giveaways :: Data > } ; (@ field_type ; giveaways) => { Vec < crate :: prisma :: giveaway :: Data > } ; (@ field_type ; winnings : $ selection_mode : ident { $ ($ selections : tt) + }) => { Vec < winnings :: Data > } ; (@ field_type ; winnings) => { Vec < crate :: prisma :: giveaway :: Data > } ; (@ field_type ; oauth : $ selection_mode : ident { $ ($ selections : tt) + }) => { Option < oauth :: Data > } ; (@ field_type ; oauth) => { Option < crate :: prisma :: oauth :: Data > } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "User" , available relations are "giveaways, winnings, oauth")) } ; (@ field_module ; giveaways : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: giveaway :: include ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; winnings : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: giveaway :: include ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; oauth : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: oauth :: include ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; giveaways $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: user :: IncludeParam > :: into (crate :: prisma :: user :: giveaways :: Include :: $ selection_mode (crate :: prisma :: giveaway :: ManyArgs :: new (crate :: prisma :: giveaway :: include ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ? , crate :: prisma :: giveaway :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; giveaways $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: user :: IncludeParam > :: into (crate :: prisma :: user :: giveaways :: Include :: Fetch (crate :: prisma :: giveaway :: ManyArgs :: new (crate :: prisma :: giveaway :: include ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ?) ,) } } ; (@ selection_field_to_selection_param ; winnings $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: user :: IncludeParam > :: into (crate :: prisma :: user :: winnings :: Include :: $ selection_mode (crate :: prisma :: giveaway :: ManyArgs :: new (crate :: prisma :: giveaway :: include ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ? , crate :: prisma :: giveaway :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; winnings $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: user :: IncludeParam > :: into (crate :: prisma :: user :: winnings :: Include :: Fetch (crate :: prisma :: giveaway :: ManyArgs :: new (crate :: prisma :: giveaway :: include ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ?) ,) } } ; (@ selection_field_to_selection_param ; oauth $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: user :: IncludeParam > :: into (crate :: prisma :: user :: oauth :: Include :: $ selection_mode (crate :: prisma :: oauth :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; oauth $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: user :: IncludeParam > :: into (crate :: prisma :: user :: oauth :: Include :: Fetch) } } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: user :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; giveaways) => { "giveaways" } ; (@ field_serde_name ; winnings) => { "winnings" } ; (@ field_serde_name ; oauth) => { "oauth" } ; }
     pub use _include_user as include;
     pub enum IncludeParam {
         Id(id::Include),
         Giveaways(giveaways::Include),
+        Winnings(winnings::Include),
         Oauth(oauth::Include),
     }
     impl IncludeParam {
@@ -5849,6 +6291,7 @@ pub mod user {
             match self {
                 Self::Id(data) => data.to_selection(),
                 Self::Giveaways(data) => data.to_selection(),
+                Self::Winnings(data) => data.to_selection(),
                 Self::Oauth(data) => data.to_selection(),
             }
         }
@@ -5862,6 +6305,8 @@ pub mod user {
         pub id: i64,
         #[serde(rename = "giveaways")]
         pub giveaways: Option<Vec<super::giveaway::Data>>,
+        #[serde(rename = "winnings")]
+        pub winnings: Option<Vec<super::giveaway::Data>>,
         #[serde(
             rename = "oauth",
             default,
@@ -5881,6 +6326,16 @@ pub mod user {
                     stringify!(giveaways),
                 ))
         }
+        pub fn winnings(
+            &self,
+        ) -> Result<&Vec<super::giveaway::Data>, ::prisma_client_rust::RelationNotFetchedError>
+        {
+            self.winnings
+                .as_ref()
+                .ok_or(::prisma_client_rust::RelationNotFetchedError::new(
+                    stringify!(winnings),
+                ))
+        }
         pub fn oauth(
             &self,
         ) -> Result<Option<&super::oauth::Data>, ::prisma_client_rust::RelationNotFetchedError>
@@ -5896,6 +6351,7 @@ pub mod user {
     #[derive(Clone)]
     pub enum WithParam {
         Giveaways(super::giveaway::ManyArgs),
+        Winnings(super::giveaway::ManyArgs),
         Oauth(super::oauth::UniqueArgs),
     }
     impl Into<::prisma_client_rust::Selection> for WithParam {
@@ -5906,6 +6362,16 @@ pub mod user {
                     nested_selections . extend (< super :: giveaway :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()) ;
                     ::prisma_client_rust::Selection::new(
                         giveaways::NAME,
+                        None,
+                        arguments,
+                        nested_selections,
+                    )
+                }
+                Self::Winnings(args) => {
+                    let (arguments, mut nested_selections) = args.to_graphql();
+                    nested_selections . extend (< super :: giveaway :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()) ;
+                    ::prisma_client_rust::Selection::new(
+                        winnings::NAME,
                         None,
                         arguments,
                         nested_selections,
@@ -5933,6 +6399,9 @@ pub mod user {
         ConnectGiveaways(Vec<super::giveaway::UniqueWhereParam>),
         DisconnectGiveaways(Vec<super::giveaway::UniqueWhereParam>),
         SetGiveaways(Vec<super::giveaway::UniqueWhereParam>),
+        ConnectWinnings(Vec<super::giveaway::UniqueWhereParam>),
+        DisconnectWinnings(Vec<super::giveaway::UniqueWhereParam>),
+        SetWinnings(Vec<super::giveaway::UniqueWhereParam>),
         ConnectOauth(super::oauth::UniqueWhereParam),
         DisconnectOauth,
     }
@@ -6016,6 +6485,51 @@ pub mod user {
                         ),
                     )]),
                 ),
+                SetParam::ConnectWinnings(where_params) => (
+                    winnings::NAME.to_string(),
+                    ::prisma_client_rust::PrismaValue::Object(vec![(
+                        "connect".to_string(),
+                        ::prisma_client_rust::PrismaValue::List(
+                            where_params
+                                .into_iter()
+                                .map(Into::<super::giveaway::WhereParam>::into)
+                                .map(::prisma_client_rust::WhereInput::serialize)
+                                .map(::prisma_client_rust::SerializedWhereInput::transform_equals)
+                                .map(|v| ::prisma_client_rust::PrismaValue::Object(vec![v]))
+                                .collect(),
+                        ),
+                    )]),
+                ),
+                SetParam::DisconnectWinnings(where_params) => (
+                    winnings::NAME.to_string(),
+                    ::prisma_client_rust::PrismaValue::Object(vec![(
+                        "disconnect".to_string(),
+                        ::prisma_client_rust::PrismaValue::List(
+                            where_params
+                                .into_iter()
+                                .map(Into::<super::giveaway::WhereParam>::into)
+                                .map(::prisma_client_rust::WhereInput::serialize)
+                                .map(::prisma_client_rust::SerializedWhereInput::transform_equals)
+                                .map(|v| ::prisma_client_rust::PrismaValue::Object(vec![v]))
+                                .collect(),
+                        ),
+                    )]),
+                ),
+                SetParam::SetWinnings(where_params) => (
+                    winnings::NAME.to_string(),
+                    ::prisma_client_rust::PrismaValue::Object(vec![(
+                        "set".to_string(),
+                        ::prisma_client_rust::PrismaValue::List(
+                            where_params
+                                .into_iter()
+                                .map(Into::<super::giveaway::WhereParam>::into)
+                                .map(::prisma_client_rust::WhereInput::serialize)
+                                .map(::prisma_client_rust::SerializedWhereInput::transform_equals)
+                                .map(|v| ::prisma_client_rust::PrismaValue::Object(vec![v]))
+                                .collect(),
+                        ),
+                    )]),
+                ),
                 SetParam::ConnectOauth(where_param) => (
                     oauth::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::Object(vec![(
@@ -6074,6 +6588,9 @@ pub mod user {
         GiveawaysSome(Vec<super::giveaway::WhereParam>),
         GiveawaysEvery(Vec<super::giveaway::WhereParam>),
         GiveawaysNone(Vec<super::giveaway::WhereParam>),
+        WinningsSome(Vec<super::giveaway::WhereParam>),
+        WinningsEvery(Vec<super::giveaway::WhereParam>),
+        WinningsNone(Vec<super::giveaway::WhereParam>),
         OauthIsNull,
         OauthIs(Vec<super::oauth::WhereParam>),
         OauthIsNot(Vec<super::oauth::WhereParam>),
@@ -6146,6 +6663,45 @@ pub mod user {
                 ),
                 Self::GiveawaysNone(where_params) => (
                     giveaways::NAME,
+                    ::prisma_client_rust::SerializedWhereValue::Object(vec![(
+                        "none".to_string(),
+                        ::prisma_client_rust::PrismaValue::Object(
+                            where_params
+                                .into_iter()
+                                .map(::prisma_client_rust::WhereInput::serialize)
+                                .map(::prisma_client_rust::SerializedWhereInput::transform_equals)
+                                .collect(),
+                        ),
+                    )]),
+                ),
+                Self::WinningsSome(where_params) => (
+                    winnings::NAME,
+                    ::prisma_client_rust::SerializedWhereValue::Object(vec![(
+                        "some".to_string(),
+                        ::prisma_client_rust::PrismaValue::Object(
+                            where_params
+                                .into_iter()
+                                .map(::prisma_client_rust::WhereInput::serialize)
+                                .map(::prisma_client_rust::SerializedWhereInput::transform_equals)
+                                .collect(),
+                        ),
+                    )]),
+                ),
+                Self::WinningsEvery(where_params) => (
+                    winnings::NAME,
+                    ::prisma_client_rust::SerializedWhereValue::Object(vec![(
+                        "every".to_string(),
+                        ::prisma_client_rust::PrismaValue::Object(
+                            where_params
+                                .into_iter()
+                                .map(::prisma_client_rust::WhereInput::serialize)
+                                .map(::prisma_client_rust::SerializedWhereInput::transform_equals)
+                                .collect(),
+                        ),
+                    )]),
+                ),
+                Self::WinningsNone(where_params) => (
+                    winnings::NAME,
                     ::prisma_client_rust::SerializedWhereValue::Object(vec![(
                         "none".to_string(),
                         ::prisma_client_rust::PrismaValue::Object(
@@ -7584,8 +8140,8 @@ pub mod _prisma {
         StartAt,
         #[serde(rename = "end_at")]
         EndAt,
-        #[serde(rename = "winners")]
-        Winners,
+        #[serde(rename = "winners_count")]
+        WinnersCount,
         #[serde(rename = "is_ended")]
         IsEnded,
         #[serde(rename = "created_at")]
@@ -7603,7 +8159,7 @@ pub mod _prisma {
                 Self::Host => "host".to_string(),
                 Self::StartAt => "start_at".to_string(),
                 Self::EndAt => "end_at".to_string(),
-                Self::Winners => "winners".to_string(),
+                Self::WinnersCount => "winners_count".to_string(),
                 Self::IsEnded => "is_ended".to_string(),
                 Self::CreatedAt => "created_at".to_string(),
                 Self::UpdatedAt => "updated_at".to_string(),

@@ -4,6 +4,7 @@ use axum::Router;
 use config::{DEFAULT_PREFIX, DISCORD_TOKEN, PORT};
 use entities::*;
 use giveaway::manager::GiveawayManager;
+use http::{HeaderValue, Method};
 use once_cell::sync::OnceCell;
 use prisma_client::db::{EntryType, PrismaClient};
 use tokio::{net::TcpListener, sync::mpsc};
@@ -14,6 +15,8 @@ use poise::{
     PrefixFrameworkOptions,
 };
 use prelude::*;
+use tower_http::cors::{AllowOrigin, Any, CorsLayer};
+use transformers::CommandResponse;
 use std::{ops::Deref, time::Duration};
 use tokio::time::sleep;
 
@@ -26,6 +29,10 @@ mod middlewares;
 mod prelude;
 mod routes;
 mod structures;
+mod utils;
+mod transformers;
+
+
 
 pub static PRISMA: OnceCell<PrismaClient> = OnceCell::new();
 
@@ -67,14 +74,13 @@ async fn main() {
     let intents = serenity::GatewayIntents::all();
     let (tx, mut rx) = mpsc::channel(100);
     let manager = GiveawayManager::new(tx).await;
-
     let data = Data {
         manager,
         prisma: get_prisma(),
         commands: commands
             .iter()
-            .filter(|f| f.category == Some("Giveaway".to_owned()))
-            .map(|f| f.name.clone())
+            .filter(|f|f.category.as_ref().map(|c| !["Admin"].contains(&c.as_str())).unwrap_or(false))
+            .map(|f| CommandResponse::from_command(f))
             .collect(),
     };
     let router_data = data.clone();
@@ -86,7 +92,6 @@ async fn main() {
             prefix_options: PrefixFrameworkOptions {
                 dynamic_prefix: Some(|ctx| {
                     Box::pin(async move {
-                        println!("test");
                         if let Some(id) = ctx.guild_id {
                             if let Ok(guild) = GuildEntity::new(&id).find_or_create().await {
                                 Ok(Some(guild.prefix))
@@ -201,10 +206,14 @@ async fn main() {
     let app_state = AppState {
         data: router_data,
         cache: client.cache.clone(),
+        http: client.http.clone()
     };
     // region: Router
     let app = routes::mount(Router::new(), app_state.clone())
-        // .layer(layer)
+        .layer(CorsLayer::new()
+        .allow_credentials(true)
+        .allow_methods([Method::GET, Method::POST])
+        .allow_origin(AllowOrigin::exact("http://127.0.0.1:3000".parse().unwrap())))
         .with_state(app_state);
     // let app = Router::new().route("/", get(|| async { "Hello, World!" }));
 
@@ -239,13 +248,15 @@ async fn event_handler(
 ) -> Result<(), Error> {
     match event {
         serenity::FullEvent::ReactionAdd { add_reaction } => {
+            println!("{:?}", add_reaction.guild_id);
             // chekc if reaction on embed
             if let Some(giveaway) = data.manager.giveaways.get(&add_reaction.message_id) {
                 let mut giveaway = giveaway.lock().await;
                 // check if the giveaway is reaction type
                 println!("Reaction add");
                 if giveaway.options.guild.entry_type == EntryType::Reaction {
-                    if giveaway.options.guild.reaction == add_reaction.emoji.as_data() {
+                    println!("{} {}", giveaway.options.guild.reaction, add_reaction.emoji.to_string());
+                    if giveaway.options.guild.reaction == add_reaction.emoji.to_string() {
                         println!("Adding entry: {:?}", add_reaction.user_id);
                         if let Some(id) = add_reaction.user_id {
                             giveaway.add_entry(id, ctx.http.clone()).await?;
